@@ -30,13 +30,13 @@
 
 **⚠️ CRITICAL**: 本階段完成前，不得開始任何使用者故事的頁面功能實作。
 
-- [ ] T005 [P] 建立 `CardPicker/Models/MealType.cs`、`CardPicker/Models/MealCard.cs`、`CardPicker/Models/CardLibraryDocument.cs`、`CardPicker/Models/CardSearchCriteria.cs`，定義 `Guid.CreateVersion7()` ID、`CreatedAtUtc` / `UpdatedAtUtc`、`SchemaVersion = "1.0"` 與核心驗證邊界
-- [ ] T006 [P] 建立 `CardPicker/Options/CardStorageOptions.cs` 與 `CardPicker/data/cards.json`，定義資料檔設定與三餐種子卡牌
-- [ ] T007 [P] 建立 `CardPicker/Services/IMealCardRepository.cs` 與 `CardPicker/Services/JsonMealCardRepository.cs`，實作版本化 JSON 載入、原子寫入、首次初始化與持久化失敗記錄邏輯
-- [ ] T008 [P] 建立 `CardPicker/Services/IMealCardService.cs` 與 `CardPicker/Services/MealCardService.cs`，封裝卡牌查詢、依 ID 讀取與共用驗證規則
-- [ ] T009 [P] 建立 `CardPicker.Tests/Integration/Infrastructure/CardPickerWebApplicationFactory.cs` 與 `CardPicker.Tests/Integration/Infrastructure/TestCardDataDirectory.cs`，提供隔離式整合測試宿主與臨時資料目錄
-- [ ] T010 [P] 建立 `CardPicker.Tests/Unit/Services/MealCardServiceTests.cs` 與 `CardPicker.Tests/Integration/Infrastructure/JsonMealCardRepositoryTests.cs`，先鎖定資料完整性、種子初始化與 JSON 持久化基線
-- [ ] T011 更新 `CardPicker/Program.cs`、`CardPicker/appsettings.json` 與 `CardPicker/appsettings.Development.json`，註冊 Serilog、HTTPS/HSTS、CSP、`CardStorageOptions`、Repository 與基礎服務
+- [X] T005 [P] 建立 `CardPicker/Models/MealType.cs`、`CardPicker/Models/MealCard.cs`、`CardPicker/Models/CardLibraryDocument.cs`、`CardPicker/Models/CardSearchCriteria.cs`，定義 `Guid.CreateVersion7()` ID、`CreatedAtUtc` / `UpdatedAtUtc`、`SchemaVersion = "1.0"` 與核心驗證邊界
+- [X] T006 [P] 建立 `CardPicker/Options/CardStorageOptions.cs` 與 `CardPicker/data/cards.json`，定義資料檔設定與三餐種子卡牌
+- [X] T007 [P] 建立 `CardPicker/Services/IMealCardRepository.cs` 與 `CardPicker/Services/JsonMealCardRepository.cs`，實作版本化 JSON 載入、原子寫入、首次初始化與持久化失敗記錄邏輯
+- [X] T008 [P] 建立 `CardPicker/Services/IMealCardService.cs` 與 `CardPicker/Services/MealCardService.cs`，封裝卡牌查詢、依 ID 讀取與共用驗證規則
+- [X] T009 [P] 建立 `CardPicker.Tests/Integration/Infrastructure/CardPickerWebApplicationFactory.cs` 與 `CardPicker.Tests/Integration/Infrastructure/TestCardDataDirectory.cs`，提供隔離式整合測試宿主與臨時資料目錄
+- [X] T010 [P] 建立 `CardPicker.Tests/Unit/Services/MealCardServiceTests.cs` 與 `CardPicker.Tests/Integration/Infrastructure/JsonMealCardRepositoryTests.cs`，先鎖定資料完整性、種子初始化與 JSON 持久化基線
+- [X] T011 更新 `CardPicker/Program.cs`、`CardPicker/appsettings.json` 與 `CardPicker/appsettings.Development.json`，註冊 Serilog、HTTPS/HSTS、CSP、`CardStorageOptions`、Repository 與基礎服務
 
 **Checkpoint**: 完成後可開始各使用者故事；US1、US2、US3 皆只依賴本階段成果即可獨立推進。
 
