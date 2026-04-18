@@ -39,6 +39,7 @@ public sealed class HomeDrawPageTests
         Assert.Contains("晚餐", html, StringComparison.Ordinal);
         Assert.Contains("抽一張", html, StringComparison.Ordinal);
         Assert.Contains("__RequestVerificationToken", html, StringComparison.Ordinal);
+        Assert.Contains("href=\"/Cards/Create\"", html, StringComparison.Ordinal);
     }
 
     [Fact]

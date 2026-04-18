@@ -7,9 +7,22 @@
 
 <section class="library-page">
     <header class="library-page__header">
-        <h1 class="library-page__title">餐點卡牌庫</h1>
-        <p class="library-page__subtitle">依名稱或餐別篩選，快速查看目前可用的餐點卡牌。</p>
+        <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-start gap-3">
+            <div>
+                <h1 class="library-page__title">餐點卡牌庫</h1>
+                <p class="library-page__subtitle mb-0">依名稱或餐別篩選，快速查看目前可用的餐點卡牌。</p>
+            </div>
+
+            <a asp-page="/Cards/Create" class="btn btn-primary">新增卡牌</a>
+        </div>
     </header>
+
+    @if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+    {
+        <div class="alert alert-success" role="status" aria-live="polite">
+            @Model.StatusMessage
+        </div>
+    }
 
     <form method="get" asp-page="/Cards/Index" class="library-search">
         <div class="library-search__fields">
@@ -69,8 +82,8 @@
                                 class="btn btn-sm btn-outline-primary">
                                 查看詳情
                             </a>
-                            <span class="btn btn-sm btn-outline-secondary disabled" aria-disabled="true">編輯（第五階段）</span>
-                            <span class="btn btn-sm btn-outline-secondary disabled" aria-disabled="true">刪除（第五階段）</span>
+                            <a asp-page="/Cards/Edit" asp-route-id="@card.Id" class="btn btn-sm btn-outline-secondary">編輯</a>
+                            <a asp-page="/Cards/Delete" asp-route-id="@card.Id" class="btn btn-sm btn-outline-danger">刪除</a>
                         </div>
                     </li>
                 }
@@ -93,6 +106,11 @@
                     <dd>@Model.SelectedCard.Description</dd>
                 </div>
             </dl>
+
+            <div class="d-flex gap-2">
+                <a asp-page="/Cards/Edit" asp-route-id="@Model.SelectedCard.Id" class="btn btn-outline-secondary">編輯這張卡牌</a>
+                <a asp-page="/Cards/Delete" asp-route-id="@Model.SelectedCard.Id" class="btn btn-outline-danger">刪除這張卡牌</a>
+            </div>
         </section>
     }
 </section>

@@ -46,6 +46,29 @@ public sealed class CardLibraryPageTests
     }
 
     [Fact]
+    public async Task GetAsync_WhenRequestingCardsPage_RendersCrudEntryPointsForLibraryManagement()
+    {
+        const string firstCardId = "0195f2f4e7d47c6496ef0bbca4e6df6d";
+
+        using var factory = CardPickerWebApplicationFactory.CreateWithCardsJson(
+            CreateCardsJson(
+                CreateCard(
+                    firstCardId,
+                    "火腿蛋吐司",
+                    MealType.Breakfast,
+                    "附近早餐店的招牌組合，五分鐘內可以外帶。")));
+        using var client = CreateHttpsClient(factory);
+
+        var response = await client.GetAsync("/Cards");
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("href=\"/Cards/Create\"", html, StringComparison.Ordinal);
+        Assert.Contains($"href=\"/Cards/Edit?id={firstCardId}\"", html, StringComparison.Ordinal);
+        Assert.Contains($"href=\"/Cards/Delete?id={firstCardId}\"", html, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task GetAsync_WhenKeywordIsProvided_FiltersCardsByCaseInsensitivePartialName()
     {
         using var factory = CardPickerWebApplicationFactory.CreateWithCardsJson(

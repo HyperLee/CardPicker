@@ -7,6 +7,8 @@ namespace CardPicker.Pages.Cards;
 
 public sealed class IndexModel : PageModel
 {
+    private const string StatusMessageKey = "StatusMessage";
+
     private readonly IMealCardService _mealCardService;
 
     public IndexModel(IMealCardService mealCardService)
@@ -24,6 +26,9 @@ public sealed class IndexModel : PageModel
 
     [BindProperty(SupportsGet = true, Name = "id")]
     public string? SelectedCardId { get; set; }
+
+    [TempData(Key = StatusMessageKey)]
+    public string? StatusMessage { get; set; }
 
     public IReadOnlyList<MealCard> Cards { get; private set; } = Array.Empty<MealCard>();
 

@@ -99,17 +99,17 @@
 
 **Gate**: `T023`、`T024` 完成並確認失敗後，必須先取得使用者批准，才能開始 `T025`-`T030`。
 
-- [ ] T023 [P] [US3] 建立 `CardPicker.Tests/Unit/Services/MealCardMutationTests.cs`，先驗證必填欄位、不可變 ID、`Trim()` + 換行正規化 + 大小寫不敏感去重、編輯撞成重複與刪除後不可再查得
-- [ ] T024 [P] [US3] 建立 `CardPicker.Tests/Integration/Pages/CardManagementPageTests.cs`，先驗證新增、編輯、刪除、Anti-Forgery、確認刪除、不存在 ID、Create/Delete 寫入失敗提示與重啟後資料仍保留
+- [X] T023 [P] [US3] 建立 `CardPicker.Tests/Unit/Services/MealCardMutationTests.cs`，先驗證必填欄位、不可變 ID、`Trim()` + 換行正規化 + 大小寫不敏感去重、編輯撞成重複與刪除後不可再查得
+- [X] T024 [P] [US3] 建立 `CardPicker.Tests/Integration/Pages/CardManagementPageTests.cs`，先驗證新增、編輯、刪除、Anti-Forgery、確認刪除、不存在 ID、Create/Delete 寫入失敗提示與重啟後資料仍保留
 
 ### Implementation for User Story 3
 
-- [ ] T025 [P] [US3] 建立 `CardPicker/Pages/Cards/CardFormInputModel.cs`，集中定義 Create/Edit 共用輸入模型與 zh-TW 驗證訊息
-- [ ] T026 [US3] 更新 `CardPicker/Services/IMealCardService.cs` 與 `CardPicker/Services/MealCardService.cs`，補齊 `Guid.CreateVersion7()` 建立、不可變 ID、`CreatedAtUtc` / `UpdatedAtUtc` 維護、create/edit 共用的 `Trim()` + 換行正規化 + 大小寫不敏感重複比對、持久化協調與操作/驗證失敗日誌
-- [ ] T027 [P] [US3] 更新 `CardPicker/Pages/Cards/Create.cshtml.cs` 與 `CardPicker/Pages/Cards/Create.cshtml`，實作新增頁面、Anti-Forgery、表單驗證、寫入失敗時保留輸入並顯示通用錯誤，以及成功導回流程
-- [ ] T028 [P] [US3] 更新 `CardPicker/Pages/Cards/Edit.cshtml.cs` 與 `CardPicker/Pages/Cards/Edit.cshtml`，實作編輯頁面、既有資料預載、資料不存在 / 重複處理與儲存後刷新流程
-- [ ] T029 [P] [US3] 更新 `CardPicker/Pages/Cards/Delete.cshtml.cs` 與 `CardPicker/Pages/Cards/Delete.cshtml`，實作刪除確認頁面、`confirmDelete` 明確確認、Anti-Forgery、刪除失敗時的通用錯誤提示與確認後永久移除流程
-- [ ] T030 [US3] 更新 `CardPicker/Pages/Cards/Index.cshtml`、`CardPicker/Pages/Cards/Index.cshtml.cs` 與 `CardPicker/Pages/Shared/_Layout.cshtml`，串接新增/編輯/刪除操作入口、操作後狀態訊息，並在 US3 完成後啟用新增卡牌導覽連結
+- [X] T025 [P] [US3] 建立 `CardPicker/Pages/Cards/CardFormInputModel.cs`，集中定義 Create/Edit 共用輸入模型與 zh-TW 驗證訊息
+- [X] T026 [US3] 更新 `CardPicker/Services/IMealCardService.cs` 與 `CardPicker/Services/MealCardService.cs`，補齊 `Guid.CreateVersion7()` 建立、不可變 ID、`CreatedAtUtc` / `UpdatedAtUtc` 維護、create/edit 共用的 `Trim()` + 換行正規化 + 大小寫不敏感重複比對、持久化協調與操作/驗證失敗日誌
+- [X] T027 [P] [US3] 更新 `CardPicker/Pages/Cards/Create.cshtml.cs` 與 `CardPicker/Pages/Cards/Create.cshtml`，實作新增頁面、Anti-Forgery、表單驗證、寫入失敗時保留輸入並顯示通用錯誤，以及成功導回流程
+- [X] T028 [P] [US3] 更新 `CardPicker/Pages/Cards/Edit.cshtml.cs` 與 `CardPicker/Pages/Cards/Edit.cshtml`，實作編輯頁面、既有資料預載、資料不存在 / 重複處理與儲存後刷新流程
+- [X] T029 [P] [US3] 更新 `CardPicker/Pages/Cards/Delete.cshtml.cs` 與 `CardPicker/Pages/Cards/Delete.cshtml`，實作刪除確認頁面、`confirmDelete` 明確確認、Anti-Forgery、刪除失敗時的通用錯誤提示與確認後永久移除流程
+- [X] T030 [US3] 更新 `CardPicker/Pages/Cards/Index.cshtml`、`CardPicker/Pages/Cards/Index.cshtml.cs` 與 `CardPicker/Pages/Shared/_Layout.cshtml`，串接新增/編輯/刪除操作入口、操作後狀態訊息，並在 US3 完成後啟用新增卡牌導覽連結
 
 **Checkpoint**: US3 完成後，卡牌庫可由使用者自行維護，且所有後續瀏覽、搜尋與抽卡都會反映最新資料。
 

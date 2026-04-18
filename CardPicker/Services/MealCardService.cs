@@ -14,6 +14,8 @@ namespace CardPicker.Services;
 /// </example>
 public sealed class MealCardService : IMealCardService
 {
+    private const string DuplicateMealCardMessage = "相同內容的卡牌已存在，請勿重複新增。";
+
     private readonly IMealCardRepository _repository;
     private readonly ILogger<MealCardService> _logger;
 
@@ -80,7 +82,147 @@ public sealed class MealCardService : IMealCardService
         return cards.FirstOrDefault(card => string.Equals(card.Id, normalizedCardId, StringComparison.OrdinalIgnoreCase));
     }
 
+    /// <inheritdoc />
+    public async Task<MealCard> CreateCardAsync(
+        string name,
+        MealType mealType,
+        string description,
+        CancellationToken cancellationToken = default)
+    {
+        MealCard createdCard;
+        try
+        {
+            createdCard = MealCard.Create(name, ValidateMealType(mealType), description);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Meal card create validation failed.");
+            throw;
+        }
+
+        var document = await LoadValidatedDocumentAsync(cancellationToken).ConfigureAwait(false);
+
+        try
+        {
+            EnsureUniqueCardContent(document.Cards, createdCard);
+        }
+        catch (InvalidDataException ex)
+        {
+            _logger.LogWarning(ex, "Meal card create validation failed.");
+            throw;
+        }
+
+        var updatedDocument = document.WithCards([.. document.Cards, createdCard]);
+        await SaveDocumentAsync(
+                updatedDocument,
+                createdCard.Id,
+                "created",
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        return createdCard;
+    }
+
+    /// <inheritdoc />
+    public async Task<MealCard> EditCardAsync(
+        string cardId,
+        string name,
+        MealType mealType,
+        string description,
+        CancellationToken cancellationToken = default)
+    {
+        string normalizedCardId;
+        try
+        {
+            normalizedCardId = NormalizeCardId(cardId);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Meal card edit validation failed.");
+            throw;
+        }
+
+        var document = await LoadValidatedDocumentAsync(cancellationToken).ConfigureAwait(false);
+        var existingCard = document.Cards.FirstOrDefault(
+            card => string.Equals(card.Id, normalizedCardId, StringComparison.OrdinalIgnoreCase));
+
+        if (existingCard is null)
+        {
+            var exception = new KeyNotFoundException($"Meal card '{normalizedCardId}' was not found.");
+            _logger.LogWarning(exception, "Meal card edit validation failed.");
+            throw exception;
+        }
+
+        MealCard updatedCard;
+        try
+        {
+            updatedCard = existingCard.WithUpdatedContent(name, ValidateMealType(mealType), description);
+            EnsureUniqueCardContent(document.Cards, updatedCard, normalizedCardId);
+        }
+        catch (Exception ex) when (ex is ArgumentException or InvalidDataException)
+        {
+            _logger.LogWarning(ex, "Meal card edit validation failed.");
+            throw;
+        }
+
+        var updatedDocument = document.WithCards(
+            document.Cards.Select(
+                card => string.Equals(card.Id, normalizedCardId, StringComparison.OrdinalIgnoreCase)
+                    ? updatedCard
+                    : card));
+
+        await SaveDocumentAsync(
+                updatedDocument,
+                normalizedCardId,
+                "updated",
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        return updatedCard;
+    }
+
+    /// <inheritdoc />
+    public async Task DeleteCardAsync(string cardId, CancellationToken cancellationToken = default)
+    {
+        string normalizedCardId;
+        try
+        {
+            normalizedCardId = NormalizeCardId(cardId);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Meal card delete validation failed.");
+            throw;
+        }
+
+        var document = await LoadValidatedDocumentAsync(cancellationToken).ConfigureAwait(false);
+        var remainingCards = document.Cards
+            .Where(card => !string.Equals(card.Id, normalizedCardId, StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+
+        if (remainingCards.Length == document.Cards.Count)
+        {
+            var exception = new KeyNotFoundException($"Meal card '{normalizedCardId}' was not found.");
+            _logger.LogWarning(exception, "Meal card delete validation failed.");
+            throw exception;
+        }
+
+        var updatedDocument = document.WithCards(remainingCards);
+        await SaveDocumentAsync(
+                updatedDocument,
+                normalizedCardId,
+                "deleted",
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
     private async Task<IReadOnlyList<MealCard>> LoadValidatedCardsAsync(CancellationToken cancellationToken)
+    {
+        var document = await LoadValidatedDocumentAsync(cancellationToken).ConfigureAwait(false);
+        return document.Cards;
+    }
+
+    private async Task<CardLibraryDocument> LoadValidatedDocumentAsync(CancellationToken cancellationToken)
     {
         var document = await _repository.LoadAsync(cancellationToken).ConfigureAwait(false);
 
@@ -94,7 +236,24 @@ public sealed class MealCardService : IMealCardService
             throw;
         }
 
-        return document.Cards;
+        return document;
+    }
+
+    private async Task SaveDocumentAsync(
+        CardLibraryDocument document,
+        string cardId,
+        string operationName,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _repository.SaveAsync(document, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or InvalidOperationException)
+        {
+            _logger.LogError(ex, "Failed to persist {OperationName} meal card {CardId}.", operationName, cardId);
+            throw;
+        }
     }
 
     private static void ValidateLibrary(IReadOnlyList<MealCard> cards)
@@ -125,6 +284,32 @@ public sealed class MealCardService : IMealCardService
         }
     }
 
+    private static void EnsureUniqueCardContent(
+        IReadOnlyList<MealCard> existingCards,
+        MealCard candidateCard,
+        string? excludedCardId = null)
+    {
+        ArgumentNullException.ThrowIfNull(existingCards);
+        ArgumentNullException.ThrowIfNull(candidateCard);
+
+        var candidateKey = CreateCardContentKey(candidateCard);
+        foreach (var existingCard in existingCards)
+        {
+            ArgumentNullException.ThrowIfNull(existingCard);
+
+            if (excludedCardId is not null
+                && string.Equals(existingCard.Id, excludedCardId, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (string.Equals(CreateCardContentKey(existingCard), candidateKey, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidDataException(DuplicateMealCardMessage);
+            }
+        }
+    }
+
     private static bool MatchesMealType(MealCard card, MealType? mealType) =>
         !mealType.HasValue || card.MealType == mealType.Value;
 
@@ -145,6 +330,16 @@ public sealed class MealCardService : IMealCardService
         }
 
         return parsedId.ToString("N");
+    }
+
+    private static MealType ValidateMealType(MealType mealType)
+    {
+        if (!Enum.IsDefined(mealType))
+        {
+            throw new ArgumentOutOfRangeException(nameof(mealType), mealType, "Meal type must be Breakfast, Lunch, or Dinner.");
+        }
+
+        return mealType;
     }
 
     private static string CreateCardContentKey(MealCard card) =>
