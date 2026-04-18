@@ -16,7 +16,7 @@ public class Program
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
             .Enrich.FromLogContext()
             .WriteTo.Console()
-            .CreateBootstrapLogger();
+            .CreateLogger();
 
         try
         {

@@ -1,0 +1,98 @@
+@page
+@using CardPicker.Models
+@model CardPicker.Pages.Cards.IndexModel
+@{
+    ViewData["Title"] = "卡牌庫";
+}
+
+<section class="library-page">
+    <header class="library-page__header">
+        <h1 class="library-page__title">餐點卡牌庫</h1>
+        <p class="library-page__subtitle">依名稱或餐別篩選，快速查看目前可用的餐點卡牌。</p>
+    </header>
+
+    <form method="get" asp-page="/Cards/Index" class="library-search">
+        <div class="library-search__fields">
+            <div>
+                <label class="form-label" for="keyword">關鍵字</label>
+                <input
+                    id="keyword"
+                    name="keyword"
+                    value="@Model.Keyword"
+                    class="form-control"
+                    type="search"
+                    placeholder="例如：牛肉、便當、burger" />
+            </div>
+
+            <div>
+                <label class="form-label" for="mealType">餐別</label>
+                <select id="mealType" name="mealType" class="form-select">
+                    <option value="">全部餐別</option>
+                    <option value="@MealType.Breakfast" selected="@(Model.MealType == MealType.Breakfast)">早餐</option>
+                    <option value="@MealType.Lunch" selected="@(Model.MealType == MealType.Lunch)">午餐</option>
+                    <option value="@MealType.Dinner" selected="@(Model.MealType == MealType.Dinner)">晚餐</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="library-search__actions">
+            <button type="submit" class="btn btn-primary">搜尋</button>
+            <a asp-page="/Cards/Index" class="btn btn-outline-secondary">清除條件</a>
+        </div>
+    </form>
+
+    @if (!Model.HasCards)
+    {
+        <section class="library-empty" aria-live="polite">
+            <p class="mb-0">查無符合條件的餐點卡牌。</p>
+        </section>
+    }
+    else
+    {
+        <section class="library-results">
+            <h2 class="library-results__title">卡牌摘要</h2>
+            <ul class="library-results__list">
+                @foreach (var card in Model.Cards)
+                {
+                    <li class="library-card">
+                        <div>
+                            <h3 class="library-card__title">@card.Name</h3>
+                            <p class="library-card__meta mb-0">餐別：@IndexModel.GetMealTypeLabel(card.MealType)</p>
+                        </div>
+
+                        <div class="library-card__actions">
+                            <a
+                                asp-page="/Cards/Index"
+                                asp-route-id="@card.Id"
+                                asp-route-keyword="@Model.Keyword"
+                                asp-route-mealType="@Model.MealType"
+                                class="btn btn-sm btn-outline-primary">
+                                查看詳情
+                            </a>
+                            <span class="btn btn-sm btn-outline-secondary disabled" aria-disabled="true">編輯（第五階段）</span>
+                            <span class="btn btn-sm btn-outline-secondary disabled" aria-disabled="true">刪除（第五階段）</span>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+
+    @if (Model.SelectedCard is not null)
+    {
+        <section class="library-detail" aria-live="polite">
+            <h2 class="library-detail__title">卡牌詳情</h2>
+            <h3 class="library-detail__name">@Model.SelectedCard.Name</h3>
+            <dl class="library-detail__list">
+                <div>
+                    <dt>餐別</dt>
+                    <dd>@IndexModel.GetMealTypeLabel(Model.SelectedCard.MealType)</dd>
+                </div>
+                <div>
+                    <dt>說明</dt>
+                    <dd>@Model.SelectedCard.Description</dd>
+                </div>
+            </dl>
+        </section>
+    }
+</section>

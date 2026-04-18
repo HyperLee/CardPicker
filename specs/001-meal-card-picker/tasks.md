@@ -76,14 +76,14 @@
 
 **Gate**: `T018`、`T019` 完成並確認失敗後，必須先取得使用者批准，才能開始 `T020`-`T022`。
 
-- [ ] T018 [P] [US2] 建立 `CardPicker.Tests/Unit/Services/MealCardSearchTests.cs`，先驗證大小寫不敏感部分比對、餐別篩選與 AND 條件組合
-- [ ] T019 [P] [US2] 建立 `CardPicker.Tests/Integration/Pages/CardLibraryPageTests.cs`，先驗證 `/Cards` 列表、搜尋、清除條件、空結果與詳細內容呈現
+- [X] T018 [P] [US2] 建立 `CardPicker.Tests/Unit/Services/MealCardSearchTests.cs`，先驗證大小寫不敏感部分比對、餐別篩選與 AND 條件組合
+- [X] T019 [P] [US2] 建立 `CardPicker.Tests/Integration/Pages/CardLibraryPageTests.cs`，先驗證 `/Cards` 列表、搜尋、清除條件、空結果與詳細內容呈現
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] 更新 `CardPicker/Pages/Cards/Index.cshtml.cs`，加入查詢條件綁定、清除條件後的 query reset、摘要列表載入與卡牌詳細內容選取狀態
-- [ ] T021 [US2] 更新 `CardPicker/Pages/Cards/Index.cshtml`，實作搜尋表單、清除條件按鈕、卡牌摘要列表、詳細內容區與查無結果訊息
-- [ ] T022 [US2] 更新 `CardPicker/Pages/Shared/_Layout.cshtml`，加入首頁抽卡與卡牌列表導覽，並為新增卡牌入口預留導覽位置且在 US3 完成前先隱藏或停用連結
+- [X] T020 [P] [US2] 更新 `CardPicker/Pages/Cards/Index.cshtml.cs`，加入查詢條件綁定、清除條件後的 query reset、摘要列表載入與卡牌詳細內容選取狀態
+- [X] T021 [US2] 更新 `CardPicker/Pages/Cards/Index.cshtml`，實作搜尋表單、清除條件按鈕、卡牌摘要列表、詳細內容區與查無結果訊息
+- [X] T022 [US2] 更新 `CardPicker/Pages/Shared/_Layout.cshtml`，加入首頁抽卡與卡牌列表導覽，並為新增卡牌入口預留導覽位置且在 US3 完成前先隱藏或停用連結
 
 **Checkpoint**: US2 完成後，使用者即使不抽卡，也能只靠瀏覽與搜尋完成餐點決策流程。
 
