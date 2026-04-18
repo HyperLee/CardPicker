@@ -119,14 +119,14 @@
 
 **Purpose**: 補齊跨故事的一致性、操作引導、安全標頭、公開 API 文件與驗收覆蓋。
 
-- [ ] T031 [P] 更新 `CardPicker/Pages/Shared/_ValidationScriptsPartial.cshtml` 與 `CardPicker/wwwroot/js/site.js`，補強共用 jQuery Unobtrusive Validation partial、CSP 相容前端行為與表單可用性細節
-- [ ] T032 [P] 建立 `CardPicker.Tests/Integration/Pages/QuickstartSmokeTests.cs`，覆蓋 `specs/001-meal-card-picker/quickstart.md` 中的抽卡、搜尋、CRUD 與持久化主流程，作為 SC-003 / SC-004 的自動化驗收基線
-- [ ] T033 更新 `specs/001-meal-card-picker/quickstart.md` 與 `CardPicker.Tests/Integration/Fixtures/cards.quickstart.json`，同步最終驗收步驟、SC-001 / SC-002 可用性量測腳本、FCP / LCP 驗收步驟、測試用種子資料假設與 smoke test 使用前提
-- [ ] T034 [P] 建立 `CardPicker.Tests/Integration/Pages/SecurityHeadersTests.cs`，驗證首頁與 `/Cards` 相關頁面在正式環境組態下輸出 CSP 與必要安全標頭
-- [ ] T035 [P] 更新 `CardPicker/Models/MealType.cs`、`CardPicker/Models/MealCard.cs`、`CardPicker/Models/CardLibraryDocument.cs`、`CardPicker/Models/CardSearchCriteria.cs`、`CardPicker/Models/DrawRequest.cs`、`CardPicker/Models/DrawResult.cs`、`CardPicker/Models/DrawResultState.cs`、`CardPicker/Options/CardStorageOptions.cs`、`CardPicker/Services/IMealCardRepository.cs`、`CardPicker/Services/JsonMealCardRepository.cs`、`CardPicker/Services/IMealCardService.cs`、`CardPicker/Services/MealCardService.cs`、`CardPicker/Services/IMealDrawService.cs`、`CardPicker/Services/MealDrawService.cs`、`CardPicker/Services/IRandomIndexProvider.cs` 與 `CardPicker/Services/CryptoRandomIndexProvider.cs`，補齊 XML 文件註解（含 `<example>` 與 `<code>`）並對齊憲章品質閘門
-- [ ] T036 [P] 建立 `CardPicker.Tests/Integration/Pages/PerformanceSmokeTests.cs`，量測首頁抽卡 handler 與 `/Cards` 搜尋流程在測試資料集下的回應時間與單一請求記憶體基線，對齊 p95 < 200ms、主要互動 < 1 秒與單一請求記憶體 < 100MB 目標
-- [ ] T037 [P] 建立 `CardPicker.Tests/Integration/Pages/AccessibilityResponsiveSmokeTests.cs`，驗證首頁與 `/Cards` 系列頁面的語意結構、鍵盤可達性、驗證訊息關聯與不同 viewport 下主要操作可用性
-- [ ] T038 更新 `CardPicker/Pages/Index.cshtml`、`CardPicker/Pages/Cards/Index.cshtml`、`CardPicker/Pages/Cards/Create.cshtml`、`CardPicker/Pages/Cards/Edit.cshtml`、`CardPicker/Pages/Cards/Delete.cshtml` 與 `CardPicker/wwwroot/css/site.css`，補齊 responsive 版面、語意標記、focus 樣式、欄位說明與驗證訊息的 WCAG 2.1 對齊
+- [X] T031 [P] 更新 `CardPicker/Pages/Shared/_ValidationScriptsPartial.cshtml` 與 `CardPicker/wwwroot/js/site.js`，補強共用 jQuery Unobtrusive Validation partial、CSP 相容前端行為與表單可用性細節
+- [X] T032 [P] 建立 `CardPicker.Tests/Integration/Pages/QuickstartSmokeTests.cs`，覆蓋 `specs/001-meal-card-picker/quickstart.md` 中的抽卡、搜尋、CRUD 與持久化主流程，作為 SC-003 / SC-004 的自動化驗收基線
+- [X] T033 更新 `specs/001-meal-card-picker/quickstart.md` 與 `CardPicker.Tests/Integration/Fixtures/cards.quickstart.json`，同步最終驗收步驟、SC-001 / SC-002 可用性量測腳本、FCP / LCP 驗收步驟、測試用種子資料假設與 smoke test 使用前提
+- [X] T034 [P] 建立 `CardPicker.Tests/Integration/Pages/SecurityHeadersTests.cs`，驗證首頁與 `/Cards` 相關頁面在正式環境組態下輸出 CSP 與必要安全標頭
+- [X] T035 [P] 更新 `CardPicker/Models/MealType.cs`、`CardPicker/Models/MealCard.cs`、`CardPicker/Models/CardLibraryDocument.cs`、`CardPicker/Models/CardSearchCriteria.cs`、`CardPicker/Models/DrawRequest.cs`、`CardPicker/Models/DrawResult.cs`、`CardPicker/Models/DrawResultState.cs`、`CardPicker/Options/CardStorageOptions.cs`、`CardPicker/Services/IMealCardRepository.cs`、`CardPicker/Services/JsonMealCardRepository.cs`、`CardPicker/Services/IMealCardService.cs`、`CardPicker/Services/MealCardService.cs`、`CardPicker/Services/IMealDrawService.cs`、`CardPicker/Services/MealDrawService.cs`、`CardPicker/Services/IRandomIndexProvider.cs` 與 `CardPicker/Services/CryptoRandomIndexProvider.cs`，補齊 XML 文件註解（含 `<example>` 與 `<code>`）並對齊憲章品質閘門
+- [X] T036 [P] 建立 `CardPicker.Tests/Integration/Pages/PerformanceSmokeTests.cs`，量測首頁抽卡 handler 與 `/Cards` 搜尋流程在測試資料集下的回應時間與單一請求記憶體基線，對齊 p95 < 200ms、主要互動 < 1 秒與單一請求記憶體 < 100MB 目標
+- [X] T037 [P] 建立 `CardPicker.Tests/Integration/Pages/AccessibilityResponsiveSmokeTests.cs`，驗證首頁與 `/Cards` 系列頁面的語意結構、鍵盤可達性、驗證訊息關聯與不同 viewport 下主要操作可用性
+- [X] T038 更新 `CardPicker/Pages/Index.cshtml`、`CardPicker/Pages/Cards/Index.cshtml`、`CardPicker/Pages/Cards/Create.cshtml`、`CardPicker/Pages/Cards/Edit.cshtml`、`CardPicker/Pages/Cards/Delete.cshtml` 與 `CardPicker/wwwroot/css/site.css`，補齊 responsive 版面、語意標記、focus 樣式、欄位說明與驗證訊息的 WCAG 2.1 對齊
 
 ---
 

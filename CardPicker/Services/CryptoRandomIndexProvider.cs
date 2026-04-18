@@ -13,7 +13,16 @@ namespace CardPicker.Services;
 /// </example>
 public sealed class CryptoRandomIndexProvider : IRandomIndexProvider
 {
-    /// <inheritdoc />
+    /// <summary>
+    /// Returns a cryptographically strong random zero-based index less than the supplied exclusive upper bound.
+    /// </summary>
+    /// <param name="exclusiveUpperBound">The number of available candidates.</param>
+    /// <returns>A uniformly distributed random index in the range [0, <paramref name="exclusiveUpperBound" />).</returns>
+    /// <example>
+    /// <code>
+    /// var index = randomIndexProvider.GetIndex(5);
+    /// </code>
+    /// </example>
     public int GetIndex(int exclusiveUpperBound)
     {
         if (exclusiveUpperBound <= 0)

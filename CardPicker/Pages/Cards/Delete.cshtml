@@ -4,9 +4,9 @@
     ViewData["Title"] = "刪除餐點卡牌";
 }
 
-<section class="library-page">
+<section class="library-page" aria-labelledby="delete-card-title">
     <header class="library-page__header">
-        <h1 class="library-page__title">刪除餐點卡牌</h1>
+        <h1 id="delete-card-title" class="library-page__title">刪除餐點卡牌</h1>
         <p class="library-page__subtitle">請再次確認卡牌內容，送出後將無法復原。</p>
     </header>
 
@@ -19,8 +19,8 @@
 
     @if (Model.Card is not null)
     {
-        <section class="library-detail" aria-live="polite">
-            <h2 class="library-detail__title">刪除確認摘要</h2>
+        <section class="library-detail" aria-live="polite" aria-labelledby="delete-summary-title">
+            <h2 id="delete-summary-title" class="library-detail__title">刪除確認摘要</h2>
             <h3 class="library-detail__name">@Model.Card.Name</h3>
             <dl class="library-detail__list">
                 <div>
@@ -34,8 +34,9 @@
             </dl>
         </section>
 
-        <form method="post" asp-page="/Cards/Delete" asp-route-id="@Model.CardId" class="library-search">
+        <form method="post" asp-page="/Cards/Delete" asp-route-id="@Model.CardId" class="library-search" aria-describedby="delete-form-help">
             <input type="hidden" name="id" value="@Model.CardId" />
+            <p id="delete-form-help" class="library-search__intro">刪除後這張卡牌會從首頁抽卡、搜尋結果與後續啟動資料中移除。</p>
 
             <div class="form-check mb-3">
                 <input
@@ -44,10 +45,12 @@
                     name="confirmDelete"
                     type="checkbox"
                     value="true"
-                    checked="@Model.ConfirmDelete" />
+                    checked="@Model.ConfirmDelete"
+                    aria-describedby="confirmDelete-help" />
                 <label class="form-check-label" for="confirmDelete">
                     我已確認要刪除此餐點卡牌
                 </label>
+                <p id="confirmDelete-help" class="form-hint">請先勾選確認框，再送出刪除要求。</p>
             </div>
 
             <div class="library-search__actions">

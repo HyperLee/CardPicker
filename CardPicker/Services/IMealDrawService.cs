@@ -22,5 +22,12 @@ public interface IMealDrawService
     /// <returns>
     /// A draw result describing whether validation failed, the pool was empty, or a card was drawn.
     /// </returns>
+    /// <example>
+    /// <code>
+    /// var result = await mealDrawService.DrawAsync(
+    ///     new DrawRequest { SelectedMealType = MealType.Breakfast },
+    ///     cancellationToken);
+    /// </code>
+    /// </example>
     Task<DrawResult> DrawAsync(DrawRequest request, CancellationToken cancellationToken = default);
 }

@@ -5,11 +5,11 @@
     ViewData["Title"] = "卡牌庫";
 }
 
-<section class="library-page">
+<section class="library-page" aria-labelledby="library-page-title">
     <header class="library-page__header">
         <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-start gap-3">
             <div>
-                <h1 class="library-page__title">餐點卡牌庫</h1>
+                <h1 id="library-page-title" class="library-page__title">餐點卡牌庫</h1>
                 <p class="library-page__subtitle mb-0">依名稱或餐別篩選，快速查看目前可用的餐點卡牌。</p>
             </div>
 
@@ -24,7 +24,9 @@
         </div>
     }
 
-    <form method="get" asp-page="/Cards/Index" class="library-search">
+    <form method="get" asp-page="/Cards/Index" class="library-search" role="search" aria-describedby="library-search-help">
+        <p id="library-search-help" class="library-search__intro">可依關鍵字或餐別縮小範圍，再從列表前往查看、編輯或刪除卡牌。</p>
+
         <div class="library-search__fields">
             <div>
                 <label class="form-label" for="keyword">關鍵字</label>
@@ -34,17 +36,20 @@
                     value="@Model.Keyword"
                     class="form-control"
                     type="search"
-                    placeholder="例如：牛肉、便當、burger" />
+                    placeholder="例如：牛肉、便當、burger"
+                    aria-describedby="keyword-help" />
+                <p id="keyword-help" class="form-hint">支援大小寫不敏感的部分名稱搜尋。</p>
             </div>
 
             <div>
                 <label class="form-label" for="mealType">餐別</label>
-                <select id="mealType" name="mealType" class="form-select">
+                <select id="mealType" name="mealType" class="form-select" aria-describedby="mealType-help">
                     <option value="">全部餐別</option>
                     <option value="@MealType.Breakfast" selected="@(Model.MealType == MealType.Breakfast)">早餐</option>
                     <option value="@MealType.Lunch" selected="@(Model.MealType == MealType.Lunch)">午餐</option>
                     <option value="@MealType.Dinner" selected="@(Model.MealType == MealType.Dinner)">晚餐</option>
                 </select>
+                <p id="mealType-help" class="form-hint">若不指定餐別，系統會顯示所有卡牌。</p>
             </div>
         </div>
 
@@ -64,6 +69,7 @@
     {
         <section class="library-results">
             <h2 class="library-results__title">卡牌摘要</h2>
+            <p class="library-results__summary">目前顯示 @Model.Cards.Count 張符合條件的餐點卡牌。</p>
             <ul class="library-results__list">
                 @foreach (var card in Model.Cards)
                 {
@@ -93,8 +99,8 @@
 
     @if (Model.SelectedCard is not null)
     {
-        <section class="library-detail" aria-live="polite">
-            <h2 class="library-detail__title">卡牌詳情</h2>
+        <section class="library-detail" aria-live="polite" aria-labelledby="library-detail-title">
+            <h2 id="library-detail-title" class="library-detail__title">卡牌詳情</h2>
             <h3 class="library-detail__name">@Model.SelectedCard.Name</h3>
             <dl class="library-detail__list">
                 <div>

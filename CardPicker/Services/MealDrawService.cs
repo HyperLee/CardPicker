@@ -42,7 +42,22 @@ public sealed class MealDrawService : IMealDrawService
         _logger = logger;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Validates the request, loads candidate cards for the selected meal type, and returns one random draw result.
+    /// </summary>
+    /// <param name="request">The draw request from the home page.</param>
+    /// <param name="cancellationToken">The cancellation token for the draw operation.</param>
+    /// <returns>
+    /// A <see cref="DrawResult" /> whose state indicates whether validation failed, the candidate pool was empty,
+    /// or a meal card was drawn successfully.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// var result = await mealDrawService.DrawAsync(
+    ///     new DrawRequest { SelectedMealType = MealType.Dinner },
+    ///     cancellationToken);
+    /// </code>
+    /// </example>
     public async Task<DrawResult> DrawAsync(DrawRequest request, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);

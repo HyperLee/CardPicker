@@ -48,7 +48,17 @@ public sealed class JsonMealCardRepository : IMealCardRepository
         _cardFilePath = ResolveCardFilePath(hostEnvironment.ContentRootPath, storageOptions);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Loads the versioned meal card library document from disk, creating the seed file when configured and missing.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token for the load operation.</param>
+    /// <returns>The validated persisted meal card library document.</returns>
+    /// <example>
+    /// <code>
+    /// var document = await repository.LoadAsync(cancellationToken);
+    /// var cards = document.Cards;
+    /// </code>
+    /// </example>
     public async Task<CardLibraryDocument> LoadAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -66,7 +76,18 @@ public sealed class JsonMealCardRepository : IMealCardRepository
         return await ReadDocumentAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Persists the supplied meal card library by atomically replacing the configured JSON file.
+    /// </summary>
+    /// <param name="document">The replacement document to persist.</param>
+    /// <param name="cancellationToken">The cancellation token for the save operation.</param>
+    /// <returns>A task that completes when the document has been fully written to disk.</returns>
+    /// <example>
+    /// <code>
+    /// var document = await repository.LoadAsync(cancellationToken);
+    /// await repository.SaveAsync(document, cancellationToken);
+    /// </code>
+    /// </example>
     public Task SaveAsync(CardLibraryDocument document, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(document);

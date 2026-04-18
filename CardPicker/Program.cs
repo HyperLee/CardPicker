@@ -96,6 +96,7 @@ public class Program
             {
                 options.MaxAge = TimeSpan.FromDays(180);
                 options.IncludeSubDomains = true;
+                options.ExcludedHosts.Clear();
             });
 
         builder.Services

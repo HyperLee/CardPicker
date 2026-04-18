@@ -5,39 +5,53 @@
     ViewData["Title"] = "編輯餐點卡牌";
 }
 
-<section class="library-page">
+<section class="library-page" aria-labelledby="edit-card-title">
     <header class="library-page__header">
-        <h1 class="library-page__title">編輯餐點卡牌</h1>
+        <h1 id="edit-card-title" class="library-page__title">編輯餐點卡牌</h1>
         <p class="library-page__subtitle">更新餐點名稱、餐別與描述，儲存後會立即套用到卡牌庫。</p>
     </header>
 
-    <form method="post" asp-route-id="@Model.CardId" class="library-search">
+    <form method="post" asp-route-id="@Model.CardId" class="library-search" novalidate data-card-form aria-describedby="edit-card-form-help">
         <input type="hidden" name="id" value="@Model.CardId" />
+        <p id="edit-card-form-help" class="library-search__intro">更新後會立即同步到首頁抽卡與卡牌庫搜尋結果，請保留清楚的描述內容。</p>
 
-        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        <div asp-validation-summary="ModelOnly" class="validation-summary text-danger" role="alert" aria-live="polite" data-validation-summary></div>
 
         <div class="library-search__fields">
-            <div>
+            <div class="field-group">
                 <label asp-for="Input.Name" class="form-label"></label>
-                <input asp-for="Input.Name" class="form-control" autocomplete="off" />
-                <span asp-validation-for="Input.Name" class="text-danger"></span>
+                <input
+                    asp-for="Input.Name"
+                    class="form-control"
+                    autocomplete="off"
+                    maxlength="@MealCard.MaxNameLength"
+                    aria-describedby="Input_Name_hint Input_Name_error" />
+                <p id="Input_Name_hint" class="form-hint">請維持餐點名稱精簡且容易辨識，方便搜尋與抽卡顯示。</p>
+                <span asp-validation-for="Input.Name" id="Input_Name_error" class="field-validation-message text-danger"></span>
             </div>
 
-            <div>
+            <div class="field-group">
                 <label asp-for="Input.MealType" class="form-label"></label>
-                <select asp-for="Input.MealType" class="form-select">
+                <select asp-for="Input.MealType" class="form-select" aria-describedby="Input_MealType_hint Input_MealType_error">
                     <option value="">請選擇餐別</option>
                     <option value="@MealType.Breakfast">早餐</option>
                     <option value="@MealType.Lunch">午餐</option>
                     <option value="@MealType.Dinner">晚餐</option>
                 </select>
-                <span asp-validation-for="Input.MealType" class="text-danger"></span>
+                <p id="Input_MealType_hint" class="form-hint">必要時可調整餐別，讓首頁抽卡在正確時段顯示這張卡牌。</p>
+                <span asp-validation-for="Input.MealType" id="Input_MealType_error" class="field-validation-message text-danger"></span>
             </div>
 
-            <div>
+            <div class="field-group">
                 <label asp-for="Input.Description" class="form-label"></label>
-                <textarea asp-for="Input.Description" class="form-control" rows="5"></textarea>
-                <span asp-validation-for="Input.Description" class="text-danger"></span>
+                <textarea
+                    asp-for="Input.Description"
+                    class="form-control"
+                    rows="5"
+                    maxlength="@MealCard.MaxDescriptionLength"
+                    aria-describedby="Input_Description_hint Input_Description_error"></textarea>
+                <p id="Input_Description_hint" class="form-hint">可補充份量、特色、距離或其他幫助未來快速判斷的資訊。</p>
+                <span asp-validation-for="Input.Description" id="Input_Description_error" class="field-validation-message text-danger"></span>
             </div>
         </div>
 
@@ -47,3 +61,7 @@
         </div>
     </form>
 </section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
