@@ -3,7 +3,7 @@
 **Input**: 設計文件來自 `/specs/001-meal-card-picker/`  
 **Prerequisites**: `plan.md`、`spec.md`、`research.md`、`data-model.md`、`contracts/meal-card-pages.md`、`quickstart.md`
 
-**Tests**: 本功能已明確要求採 TDD 與可驗證的使用情境，因此各使用者故事皆先建立單元測試與整合測試，再進入實作。
+**Tests**: 本功能已明確要求採 TDD 與可驗證的使用情境，因此各使用者故事皆先建立單元測試與整合測試、確認失敗，並在取得使用者批准後再進入實作。
 
 **Organization**: 任務依使用者故事分組，讓每個故事都能獨立實作、測試與驗收。
 
@@ -32,11 +32,11 @@
 
 - [ ] T005 [P] 建立 `CardPicker/Models/MealType.cs`、`CardPicker/Models/MealCard.cs`、`CardPicker/Models/CardLibraryDocument.cs`、`CardPicker/Models/CardSearchCriteria.cs`，定義核心資料模型與驗證邊界
 - [ ] T006 [P] 建立 `CardPicker/Options/CardStorageOptions.cs` 與 `CardPicker/data/cards.json`，定義資料檔設定與三餐種子卡牌
-- [ ] T007 [P] 建立 `CardPicker/Services/IMealCardRepository.cs` 與 `CardPicker/Services/JsonMealCardRepository.cs`，實作版本化 JSON 載入、原子寫入與首次初始化邏輯
+- [ ] T007 [P] 建立 `CardPicker/Services/IMealCardRepository.cs` 與 `CardPicker/Services/JsonMealCardRepository.cs`，實作版本化 JSON 載入、原子寫入、首次初始化與持久化失敗記錄邏輯
 - [ ] T008 [P] 建立 `CardPicker/Services/IMealCardService.cs` 與 `CardPicker/Services/MealCardService.cs`，封裝卡牌查詢、依 ID 讀取與共用驗證規則
 - [ ] T009 [P] 建立 `CardPicker.Tests/Integration/Infrastructure/CardPickerWebApplicationFactory.cs` 與 `CardPicker.Tests/Integration/Infrastructure/TestCardDataDirectory.cs`，提供隔離式整合測試宿主與臨時資料目錄
 - [ ] T010 [P] 建立 `CardPicker.Tests/Unit/Services/MealCardServiceTests.cs` 與 `CardPicker.Tests/Integration/Infrastructure/JsonMealCardRepositoryTests.cs`，先鎖定資料完整性、種子初始化與 JSON 持久化基線
-- [ ] T011 更新 `CardPicker/Program.cs`、`CardPicker/appsettings.json` 與 `CardPicker/appsettings.Development.json`，註冊 Serilog、HTTPS/HSTS、`CardStorageOptions`、Repository 與基礎服務
+- [ ] T011 更新 `CardPicker/Program.cs`、`CardPicker/appsettings.json` 與 `CardPicker/appsettings.Development.json`，註冊 Serilog、HTTPS/HSTS、CSP、`CardStorageOptions`、Repository 與基礎服務
 
 **Checkpoint**: 完成後可開始各使用者故事；US1、US2、US3 皆只依賴本階段成果即可獨立推進。
 
@@ -50,13 +50,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T012 [P] [US1] 建立 `CardPicker.Tests/Unit/Services/MealDrawServiceTests.cs`，先驗證未選餐別、空卡池、僅從指定餐別抽卡與抽卡結果狀態轉換
-- [ ] T013 [P] [US1] 建立 `CardPicker.Tests/Integration/Pages/HomeDrawPageTests.cs`，先驗證首頁 `GET /` 與 `POST /?handler=Draw` 的抽卡流程、Anti-Forgery 與訊息輸出
+**Gate**: `T012`、`T013` 完成並確認失敗後，必須先取得使用者批准，才能開始 `T014`-`T017`。
+
+- [ ] T012 [P] [US1] 建立 `CardPicker.Tests/Unit/Services/MealDrawServiceTests.cs`，先驗證未選餐別、空卡池、僅從指定餐別抽卡、固定亂數索引可覆蓋所有候選卡牌以證明等機率邏輯，與抽卡結果狀態轉換
+- [ ] T013 [P] [US1] 建立 `CardPicker.Tests/Integration/Pages/HomeDrawPageTests.cs`，先驗證首頁 `GET /` 與 `POST /?handler=Draw` 的抽卡流程、Anti-Forgery、CSP 與訊息輸出
 
 ### Implementation for User Story 1
 
-- [ ] T014 [P] [US1] 建立 `CardPicker/Models/DrawRequest.cs`、`CardPicker/Models/DrawResult.cs`、`CardPicker/Models/DrawResultState.cs`、`CardPicker/Services/IRandomIndexProvider.cs` 與 `CardPicker/Services/CryptoRandomIndexProvider.cs`，定義抽卡輸入輸出與可測試亂數抽象
-- [ ] T015 [US1] 建立 `CardPicker/Services/IMealDrawService.cs` 與 `CardPicker/Services/MealDrawService.cs`，實作餐別驗證、均勻抽卡與空池處理
+- [ ] T014 [P] [US1] 建立 `CardPicker/Models/DrawRequest.cs`、`CardPicker/Models/DrawResult.cs`、`CardPicker/Models/DrawResultState.cs`、`CardPicker/Services/IRandomIndexProvider.cs` 與 `CardPicker/Services/CryptoRandomIndexProvider.cs`，定義抽卡輸入輸出與可測試、可重現的亂數索引抽象
+- [ ] T015 [US1] 建立 `CardPicker/Services/IMealDrawService.cs` 與 `CardPicker/Services/MealDrawService.cs`，實作餐別驗證、以索引均勻映射的等機率抽卡、抽卡操作記錄與空池處理
 - [ ] T016 [US1] 更新 `CardPicker/Program.cs` 與 `CardPicker/Pages/Index.cshtml.cs`，接上抽卡服務、PageModel 狀態與表單提交流程
 - [ ] T017 [US1] 更新 `CardPicker/Pages/Index.cshtml` 與 `CardPicker/wwwroot/css/site.css`，實作餐別選擇、抽卡結果卡片、錯誤/空狀態訊息與可讀性樣式
 
@@ -71,6 +73,8 @@
 **Independent Test**: 進入 `/Cards` 後，不輸入條件可看到名稱與餐別摘要；輸入名稱、餐別或兩者組合時，只顯示符合條件的卡牌；查無結果時顯示明確提示；選定卡牌時可看到完整描述。
 
 ### Tests for User Story 2
+
+**Gate**: `T018`、`T019` 完成並確認失敗後，必須先取得使用者批准，才能開始 `T020`-`T022`。
 
 - [ ] T018 [P] [US2] 建立 `CardPicker.Tests/Unit/Services/MealCardSearchTests.cs`，先驗證大小寫不敏感部分比對、餐別篩選與 AND 條件組合
 - [ ] T019 [P] [US2] 建立 `CardPicker.Tests/Integration/Pages/CardLibraryPageTests.cs`，先驗證 `/Cards` 列表、搜尋、空結果與詳細內容呈現
@@ -93,13 +97,15 @@
 
 ### Tests for User Story 3
 
+**Gate**: `T023`、`T024` 完成並確認失敗後，必須先取得使用者批准，才能開始 `T025`-`T030`。
+
 - [ ] T023 [P] [US3] 建立 `CardPicker.Tests/Unit/Services/MealCardMutationTests.cs`，先驗證必填欄位、不可變 ID、重複卡牌拒絕與刪除後不可再查得
 - [ ] T024 [P] [US3] 建立 `CardPicker.Tests/Integration/Pages/CardManagementPageTests.cs`，先驗證新增、編輯、刪除、確認刪除與重啟後資料仍保留
 
 ### Implementation for User Story 3
 
 - [ ] T025 [P] [US3] 建立 `CardPicker/Pages/Cards/CardFormInputModel.cs`，集中定義 Create/Edit 共用輸入模型與 zh-TW 驗證訊息
-- [ ] T026 [US3] 更新 `CardPicker/Services/IMealCardService.cs` 與 `CardPicker/Services/MealCardService.cs`，補齊新增、編輯、刪除、重複比對與持久化協調流程
+- [ ] T026 [US3] 更新 `CardPicker/Services/IMealCardService.cs` 與 `CardPicker/Services/MealCardService.cs`，補齊新增、編輯、刪除、重複比對、持久化協調與操作/驗證失敗日誌
 - [ ] T027 [P] [US3] 更新 `CardPicker/Pages/Cards/Create.cshtml.cs` 與 `CardPicker/Pages/Cards/Create.cshtml`，實作新增頁面、表單驗證與成功導回流程
 - [ ] T028 [P] [US3] 更新 `CardPicker/Pages/Cards/Edit.cshtml.cs` 與 `CardPicker/Pages/Cards/Edit.cshtml`，實作編輯頁面、既有資料預載與儲存後刷新流程
 - [ ] T029 [P] [US3] 更新 `CardPicker/Pages/Cards/Delete.cshtml.cs` 與 `CardPicker/Pages/Cards/Delete.cshtml`，實作刪除確認頁面與確認後永久移除流程
@@ -111,11 +117,13 @@
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-**Purpose**: 補齊跨故事的一致性、操作引導與驗收覆蓋。
+**Purpose**: 補齊跨故事的一致性、操作引導、安全標頭、公開 API 文件與驗收覆蓋。
 
-- [ ] T031 [P] 更新 `CardPicker/Pages/Shared/_ValidationScriptsPartial.cshtml` 與 `CardPicker/wwwroot/js/site.js`，統一 jQuery 驗證、Anti-Forgery 互動與表單可用性細節
-- [ ] T032 [P] 建立 `CardPicker.Tests/Integration/Pages/QuickstartSmokeTests.cs`，覆蓋 `specs/001-meal-card-picker/quickstart.md` 中的抽卡、搜尋、CRUD 與持久化主流程
-- [ ] T033 更新 `specs/001-meal-card-picker/quickstart.md` 與 `CardPicker/data/cards.json`，同步最終驗收步驟、種子資料假設與 smoke test 使用前提
+- [ ] T031 [P] 更新 `CardPicker/Pages/Shared/_ValidationScriptsPartial.cshtml` 與 `CardPicker/wwwroot/js/site.js`，統一 jQuery 驗證、Anti-Forgery 互動、CSP 相容前端行為與表單可用性細節
+- [ ] T032 [P] 建立 `CardPicker.Tests/Integration/Pages/QuickstartSmokeTests.cs`，覆蓋 `specs/001-meal-card-picker/quickstart.md` 中的抽卡、搜尋、CRUD 與持久化主流程，作為 SC-003 / SC-004 的自動化驗收基線
+- [ ] T033 更新 `specs/001-meal-card-picker/quickstart.md` 與 `CardPicker/data/cards.json`，同步最終驗收步驟、SC-001 / SC-002 可用性量測腳本、FCP / LCP 驗收步驟、種子資料假設與 smoke test 使用前提
+- [ ] T034 [P] 建立 `CardPicker.Tests/Integration/Pages/SecurityHeadersTests.cs`，驗證首頁與 `/Cards` 相關頁面在正式環境組態下輸出 CSP 與必要安全標頭
+- [ ] T035 [P] 更新 `CardPicker/Models/`、`CardPicker/Options/CardStorageOptions.cs` 與 `CardPicker/Services/` 內的公開型別，補齊 XML 文件註解（含 `<example>` 與 `<code>`）並對齊憲章品質閘門
 
 ---
 
@@ -136,7 +144,7 @@
 
 ### Within Each User Story
 
-- 測試任務必須先完成並先看到失敗，再開始實作
+- 測試任務必須先完成、先看到失敗並取得使用者批准，再開始實作
 - 先建立故事所需模型/輸入輸出，再實作服務與 PageModel
 - 最後才補上 Razor 頁面、導覽與操作細節
 - 每個故事完成後，都要能以該故事的獨立測試條件單獨驗收
@@ -148,7 +156,7 @@
 - **US1**: `T012` 與 `T013` 可並行；`T014` 可在測試草稿完成後與頁面設計分工
 - **US2**: `T018` 與 `T019` 可並行；`T020` 與 `T022` 可由不同成員分工
 - **US3**: `T023` 與 `T024` 可並行；`T027`、`T028`、`T029` 可在 `T025`、`T026` 完成後同步展開
-- **Polish**: `T031` 與 `T032` 可並行
+- **Polish**: `T031`、`T032`、`T034`、`T035` 可並行；`T033` 在前述驗收資訊確認後收尾
 
 ---
 
