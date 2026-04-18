@@ -17,10 +17,10 @@
 
 **Purpose**: 建立實作與測試專案骨架，讓後續基礎設施與故事任務可以接續落地。
 
-- [ ] T001 更新 `CardPicker/CardPicker.csproj`，加入 Serilog 與 Razor Pages 所需套件參考與設定
-- [ ] T002 建立 `CardPicker.Tests/CardPicker.Tests.csproj`，加入 xUnit、Moq、Microsoft.AspNetCore.Mvc.Testing 與測試 SDK 依賴
-- [ ] T003 更新 `CardPicker.sln`，將 `CardPicker.Tests/CardPicker.Tests.csproj` 納入方案管理
-- [ ] T004 [P] 建立 `CardPicker.Tests/GlobalUsings.cs`，整理 Web 專案與測試專案共用 using 與測試命名空間
+- [X] T001 更新 `CardPicker/CardPicker.csproj`，加入 Serilog 與 Razor Pages 所需套件參考與設定
+- [X] T002 建立 `CardPicker.Tests/CardPicker.Tests.csproj`，加入 xUnit、Moq、Microsoft.AspNetCore.Mvc.Testing 與測試 SDK 依賴
+- [X] T003 更新 `CardPicker.sln`，將 `CardPicker.Tests/CardPicker.Tests.csproj` 納入方案管理
+- [X] T004 [P] 建立 `CardPicker.Tests/GlobalUsings.cs`，整理 Web 專案與測試專案共用 using 與測試命名空間
 
 ---
 
