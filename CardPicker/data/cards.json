@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0",
+  "cards": [
+    {
+      "id": "0195f2f4e7d47c6496ef0bbca4e6df6d",
+      "name": "火腿蛋吐司",
+      "mealType": "Breakfast",
+      "description": "附近早餐店的招牌組合，五分鐘內可以外帶。",
+      "createdAtUtc": "2024-01-01T08:00:00Z",
+      "updatedAtUtc": "2024-01-01T08:00:00Z"
+    },
+    {
+      "id": "0195f2f5a1b67d1f9a2d4c9e1f0a2b3c",
+      "name": "紅燒牛肉麵",
+      "mealType": "Lunch",
+      "description": "湯頭濃郁，適合想吃熱食又需要飽足感的中午。",
+      "createdAtUtc": "2024-01-01T08:05:00Z",
+      "updatedAtUtc": "2024-01-01T08:05:00Z"
+    },
+    {
+      "id": "0195f2f63c897b2491c88d6e5f4a3210",
+      "name": "鮭魚便當",
+      "mealType": "Dinner",
+      "description": "有主菜、青菜和白飯，適合下班後快速解決晚餐。",
+      "createdAtUtc": "2024-01-01T08:10:00Z",
+      "updatedAtUtc": "2024-01-01T08:10:00Z"
+    }
+  ]
+}

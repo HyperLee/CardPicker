@@ -1,0 +1,65 @@
+@page
+@using CardPicker.Models
+@model CardPicker.Pages.Cards.CreateModel
+@{
+    ViewData["Title"] = "新增卡牌";
+}
+
+<section class="library-page" aria-labelledby="create-card-title">
+    <header class="library-page__header">
+        <h1 id="create-card-title" class="library-page__title">新增餐點卡牌</h1>
+        <p class="library-page__subtitle">輸入餐點名稱、餐別與描述，將新卡牌加入卡牌庫。</p>
+    </header>
+
+    <form method="post" class="library-search" novalidate data-card-form aria-describedby="create-card-form-help">
+        <p id="create-card-form-help" class="library-search__intro">必填欄位會顯示即時驗證提示，描述建議包含份量、地點或準備時間等線索。</p>
+        <div asp-validation-summary="ModelOnly" class="validation-summary text-danger" role="alert" aria-live="polite" data-validation-summary></div>
+
+        <div class="library-search__fields">
+            <div class="field-group">
+                <label asp-for="Input.Name" class="form-label"></label>
+                <input
+                    asp-for="Input.Name"
+                    class="form-control"
+                    autocomplete="off"
+                    maxlength="@MealCard.MaxNameLength"
+                    aria-describedby="Input_Name_hint Input_Name_error" />
+                <p id="Input_Name_hint" class="form-hint">請輸入容易辨識的餐點名稱，例如「火腿蛋吐司」或「雞腿便當」。</p>
+                <span asp-validation-for="Input.Name" id="Input_Name_error" class="field-validation-message text-danger"></span>
+            </div>
+
+            <div class="field-group">
+                <label asp-for="Input.MealType" class="form-label"></label>
+                <select asp-for="Input.MealType" class="form-select" aria-describedby="Input_MealType_hint Input_MealType_error">
+                    <option value="">請選擇餐別</option>
+                    <option value="@MealType.Breakfast">早餐</option>
+                    <option value="@MealType.Lunch">午餐</option>
+                    <option value="@MealType.Dinner">晚餐</option>
+                </select>
+                <p id="Input_MealType_hint" class="form-hint">餐別會決定首頁抽卡時卡牌出現的分類。</p>
+                <span asp-validation-for="Input.MealType" id="Input_MealType_error" class="field-validation-message text-danger"></span>
+            </div>
+
+            <div class="field-group">
+                <label asp-for="Input.Description" class="form-label"></label>
+                <textarea
+                    asp-for="Input.Description"
+                    class="form-control"
+                    rows="5"
+                    maxlength="@MealCard.MaxDescriptionLength"
+                    aria-describedby="Input_Description_hint Input_Description_error"></textarea>
+                <p id="Input_Description_hint" class="form-hint">可補充口味、預算、位置或其他幫助你做選擇的資訊。</p>
+                <span asp-validation-for="Input.Description" id="Input_Description_error" class="field-validation-message text-danger"></span>
+            </div>
+        </div>
+
+        <div class="library-search__actions">
+            <button type="submit" class="btn btn-primary">儲存卡牌</button>
+            <a asp-page="/Cards/Index" class="btn btn-outline-secondary">返回卡牌庫</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
