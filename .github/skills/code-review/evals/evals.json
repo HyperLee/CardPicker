@@ -1,0 +1,375 @@
+{
+  "skill_name": "code-review",
+  "evals": [
+    {
+      "id": 1,
+      "files": [],
+      "prompt": "Review this Python API endpoint:\n\nimport os\nimport pickle\nfrom flask import Flask, request, jsonify\n\napp = Flask(__name__)\n\n@app.route('/api/process', methods=['POST'])\ndef process_data():\n    data = pickle.loads(request.data)\n    filename = request.args.get('output', 'result.txt')\n    filepath = os.path.join('/tmp/outputs', filename)\n    with open(filepath, 'w') as f:\n        f.write(str(data))\n    return jsonify({'status': 'ok', 'file': filepath})",
+      "expected_output": "Should identify unsafe pickle deserialization as critical, path traversal via filename, missing input validation, and exposing internal file path in response",
+      "expectations": [
+        "Review identifies pickle.loads on untrusted user input as a 🔴 Critical security vulnerability (arbitrary code execution)",
+        "Review identifies path traversal risk in the output filename parameter",
+        "Review suggests using a safe deserialization format like JSON instead of pickle",
+        "Review notes that the response exposes internal server file paths",
+        "Review follows the output template with Summary, Critical Issues, Suggestions, Good Practices, and Metrics sections",
+        "Review provides concrete code fixes with examples",
+        "Review identifies at least one Good Practice or positive aspect of the code"
+      ]
+    },
+    {
+      "id": 2,
+      "files": [],
+      "prompt": "Review this React component:\n\nimport React, { useState, useEffect } from 'react';\n\nfunction UserList({ users, onSelect }) {\n  const [filtered, setFiltered] = useState(users);\n  const [search, setSearch] = useState('');\n\n  useEffect(() => {\n    setFiltered(users.filter(u => u.name.toLowerCase().includes(search)));\n  }, []);\n\n  const handleSearch = (e) => {\n    setSearch(e.target.value);\n  };\n\n  return (\n    <div>\n      <input onChange={handleSearch} value={search} />\n      {filtered.map(u => (\n        <div onClick={() => onSelect(u)}>{u.name} - {u.email}</div>\n      ))}\n    </div>\n  );\n}\n\nexport default UserList;",
+      "expected_output": "Should identify stale useEffect dependencies, missing key prop, search not working reactively, and accessibility issues",
+      "expectations": [
+        "Review identifies the stale/incomplete useEffect dependency array as a critical or major issue",
+        "Review explains that changing the search input won't actually re-filter because useEffect deps are empty",
+        "Review identifies the missing key prop in the .map() JSX",
+        "Review suggests adding search and users to the useEffect dependency array",
+        "Review provides corrected code examples",
+        "Review uses the structured output format with severity classifications",
+        "Review mentions at least one good practice (e.g., controlled input pattern, component decomposition)"
+      ]
+    },
+    {
+      "id": 3,
+      "files": [],
+      "prompt": "Can you check if this Go HTTP handler has any issues?\n\nfunc handleUpload(w http.ResponseWriter, r *http.Request) {\n    file, header, err := r.FormFile(\"document\")\n    if err != nil {\n        http.Error(w, err.Error(), 500)\n        return\n    }\n\n    filename := header.Filename\n    dst, err := os.Create(\"/uploads/\" + filename)\n    if err != nil {\n        http.Error(w, \"Failed to save\", 500)\n        return\n    }\n\n    io.Copy(dst, file)\n\n    fmt.Fprintf(w, \"Uploaded: %s\", filename)\n}",
+      "expected_output": "Should identify path traversal, missing file close/defer, missing request body limits, error exposure, and missing Content-Type validation",
+      "expectations": [
+        "Review identifies path traversal vulnerability in the filename (attacker can use ../)",
+        "Review identifies that file and dst are never closed (missing defer .Close())",
+        "Review identifies that io.Copy error is not checked",
+        "Review mentions the need for request body size limits to prevent DoS",
+        "Review identifies that err.Error() on line 4 exposes internal error details to users",
+        "Review classifies the path traversal as 🔴 Critical",
+        "Review provides concrete Go code fixes",
+        "Review identifies at least one good practice (e.g., early return pattern on error)"
+      ]
+    },
+    {
+      "id": 4,
+      "files": [],
+      "prompt": "Review this Java Spring REST controller:\n\n@RestController\n@RequestMapping(\"/api/users\")\npublic class UserController {\n\n    @Autowired\n    private UserRepository userRepo;\n\n    @GetMapping(\"/{id}\")\n    public User getUser(@PathVariable Long id) {\n        return userRepo.findById(id).get();\n    }\n\n    @PostMapping\n    public User createUser(@RequestBody User user) {\n        user.setRole(\"ADMIN\");\n        return userRepo.save(user);\n    }\n\n    @DeleteMapping(\"/{id}\")\n    public void deleteUser(@PathVariable Long id) {\n        userRepo.deleteById(id);\n    }\n}",
+      "expected_output": "Should identify .get() without isPresent check, hardcoded ADMIN role assignment, missing input validation, missing authorization, and no error handling",
+      "expectations": [
+        "Review identifies that .get() on Optional without checking isPresent will throw NoSuchElementException",
+        "Review identifies the hardcoded ADMIN role assignment as a critical security issue (privilege escalation)",
+        "Review notes the absence of authorization checks on destructive operations (delete endpoint)",
+        "Review mentions missing @Valid or input validation on the @RequestBody",
+        "Review classifies at least one issue as 🔴 Critical",
+        "Review provides concrete Java code fixes",
+        "Review follows the structured output template with Summary, Critical Issues, Suggestions, Good Practices, and Metrics sections"
+      ]
+    },
+    {
+      "id": 5,
+      "files": [],
+      "prompt": "Look at this TypeScript function and tell me what you think:\n\nasync function fetchUserData(userId: string): Promise<any> {\n  const response = await fetch(`/api/users/${userId}`);\n  const data = await response.json();\n\n  const orders = await fetch(`/api/orders?user=${userId}`);\n  const orderData = await orders.json();\n\n  const reviews = await fetch(`/api/reviews?user=${userId}`);\n  const reviewData = await reviews.json();\n\n  return {\n    ...data,\n    orders: orderData,\n    reviews: reviewData,\n    fullName: data.firstName + ' ' + data.lastName,\n    orderTotal: orderData.reduce((sum: number, o: any) => sum + o.amount, 0)\n  };\n}",
+      "expected_output": "Should identify sequential awaits that could be parallel, Promise<any> return type, missing error handling for fetch failures, missing response.ok checks",
+      "expectations": [
+        "Review identifies that the three sequential fetch calls could run in parallel with Promise.all",
+        "Review identifies the use of 'any' type as a code quality issue and suggests a proper interface/type",
+        "Review notes that response.ok is not checked — fetch doesn't throw on HTTP errors like 404 or 500",
+        "Review mentions that the function has no error handling (try/catch or .catch)",
+        "Review provides a corrected code example showing Promise.all pattern",
+        "Review uses the severity classification system (Critical/Suggestions/Good Practices)"
+      ]
+    },
+    {
+      "id": 6,
+      "files": [],
+      "prompt": "Review this PR diff for a configuration change:\n\n```diff\n--- a/docker-compose.yml\n+++ b/docker-compose.yml\n@@ -12,6 +12,14 @@ services:\n     environment:\n       - DATABASE_URL=postgresql://app:app123@db:5432/myapp\n       - REDIS_URL=redis://cache:6379\n+      - JWT_SECRET=super-secret-key-12345\n+      - AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE\n+      - AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\n+      - DEBUG=true\n+      - CORS_ORIGIN=*\n     ports:\n       - \"3000:3000\"\n+      - \"5432:5432\"\n+      - \"6379:6379\"\n```",
+      "expected_output": "Should identify hardcoded secrets (JWT, AWS keys), exposed database and Redis ports, CORS wildcard, debug mode enabled, and existing DATABASE_URL credential issue",
+      "expectations": [
+        "Review identifies hardcoded AWS credentials and JWT secret as 🔴 Critical security issues",
+        "Review identifies that database port 5432 and Redis port 6379 are exposed publicly",
+        "Review flags CORS_ORIGIN=* as a security concern",
+        "Review notes DEBUG=true should not be in production configuration",
+        "Review suggests using environment variables, secrets management, or .env files instead of hardcoded values",
+        "Review follows the structured output template with severity classifications"
+      ]
+    },
+    {
+      "id": 7,
+      "files": [],
+      "prompt": "Hey, I wrote this utility and I think it's pretty solid. Any thoughts?\n\nclass LRUCache<K, V> {\n  private capacity: number;\n  private cache: Map<K, V>;\n\n  constructor(capacity: number) {\n    this.capacity = capacity;\n    this.cache = new Map();\n  }\n\n  get(key: K): V | undefined {\n    if (!this.cache.has(key)) return undefined;\n    const value = this.cache.get(key)!;\n    this.cache.delete(key);\n    this.cache.set(key, value);\n    return value;\n  }\n\n  put(key: K, value: V): void {\n    if (this.cache.has(key)) {\n      this.cache.delete(key);\n    }\n    if (this.cache.size >= this.capacity) {\n      const oldest = this.cache.keys().next().value;\n      this.cache.delete(oldest);\n    }\n    this.cache.set(key, value);\n  }\n}",
+      "expected_output": "This is well-written code with minor suggestions. Review should be mostly positive with Good Practices, minimal or no critical issues, and perhaps a few suggestions for edge cases",
+      "expectations": [
+        "Review recognizes this as generally well-written code and states so in the Summary",
+        "Review has zero Critical Issues — the code is fundamentally correct and the review does not manufacture false problems",
+        "Review identifies at least 2 Good Practices that each reference a specific code construct (e.g., generic types, Map insertion order for LRU, clean API design)",
+        "Review may suggest edge case handling (e.g., capacity <= 0) or adding a size/clear method as Suggestions",
+        "Review follows the structured output format even for mostly-positive reviews",
+        "Review does not manufacture false critical issues just to fill sections"
+      ]
+    },
+    {
+      "id": 8,
+      "files": [],
+      "prompt": "Review this C# ASP.NET Core controller:\n\nusing Microsoft.AspNetCore.Mvc;\n\nnamespace MyApp.Controllers\n{\n    [ApiController]\n    [Route(\"api/[controller]\")]\n    public class OrdersController : ControllerBase\n    {\n        private static List<Order> _orders = new List<Order>();\n\n        [HttpPost]\n        public async Task<IActionResult> CreateOrder([FromBody] Order order)\n        {\n            order.Id = Guid.NewGuid().ToString();\n            order.CreatedAt = DateTime.Now;\n            _orders.Add(order);\n\n            var client = new HttpClient();\n            var response = await client.PostAsJsonAsync(\"https://payments.example.com/charge\", new { order.Amount });\n            if (response == null)\n                return BadRequest();\n\n            return Ok(order);\n        }\n\n        [HttpGet(\"{id}\")]\n        public IActionResult GetOrder(string id)\n        {\n            var order = _orders.FirstOrDefault(o => o.Id == id);\n            return Ok(order);\n        }\n    }\n}",
+      "expected_output": "Should identify mutable static state (thread-unsafe shared list), HttpClient instantiation per request (socket exhaustion), DateTime.Now instead of UTC, block-scoped namespace, missing null check on GetOrder, response.ok not checked",
+      "expectations": [
+        "Review identifies the mutable static List<Order> as a 🔴 Critical concurrency issue (race conditions across requests, data shared between users)",
+        "Review identifies creating new HttpClient() per request as a resource issue (socket exhaustion) and suggests IHttpClientFactory",
+        "Review notes DateTime.Now should be DateTime.UtcNow for server-side code",
+        "Review identifies that GetOrder returns Ok(null) when order is not found instead of NotFound()",
+        "Review mentions the block-scoped namespace should be file-scoped per C# conventions",
+        "Review identifies that the payment response is not properly validated (response.IsSuccessStatusCode not checked)",
+        "Review provides concrete C# code fixes",
+        "Review follows the structured output template with severity classifications"
+      ]
+    },
+    {
+      "id": 9,
+      "files": [],
+      "prompt": "Review this Rust HTTP handler:\n\nuse std::fs;\nuse std::collections::HashMap;\n\nstatic mut CACHE: Option<HashMap<String, String>> = None;\n\npub fn handle_request(path: &str, body: &str) -> String {\n    let content = fs::read_to_string(path).unwrap();\n\n    unsafe {\n        if CACHE.is_none() {\n            CACHE = Some(HashMap::new());\n        }\n        CACHE.as_mut().unwrap().insert(path.to_string(), body.to_string());\n    }\n\n    let config: serde_json::Value = serde_json::from_str(body).unwrap();\n    let name = config[\"name\"].as_str().unwrap();\n\n    let output = format!(\"Hello, {}! File content: {}\", name, content);\n    output\n}",
+      "expected_output": "Should identify unsafe mutable static (data race), excessive unwrap calls, path traversal via user-controlled file path, and missing error handling",
+      "expectations": [
+        "Review identifies the mutable static CACHE with unsafe access as a 🔴 Critical data race issue in concurrent contexts",
+        "Review identifies that reading a user-controlled file path is a path traversal / information disclosure vulnerability",
+        "Review identifies excessive use of .unwrap() that will panic on any error instead of returning proper error responses",
+        "Review suggests using proper concurrency primitives (Mutex, RwLock, or once_cell/lazy_static) instead of unsafe mutable static",
+        "Review suggests using Result<T, E> and the ? operator for error propagation",
+        "Review provides concrete Rust code fixes",
+        "Review follows the structured output template with severity classifications"
+      ]
+    },
+    {
+      "id": 10,
+      "files": [],
+      "prompt": "Find bugs in this Node.js Express login endpoint:\n\nconst express = require('express');\nconst mysql = require('mysql');\nconst app = express();\n\nconst db = mysql.createConnection({ host: 'localhost', user: 'root', password: '', database: 'myapp' });\n\napp.post('/login', (req, res) => {\n  const { username, password } = req.body;\n  const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;\n  db.query(query, (err, results) => {\n    if (err) {\n      res.status(500).json({ error: err.message });\n      return;\n    }\n    if (results.length > 0) {\n      req.session.user = results[0];\n      res.json({ message: 'Login successful', user: results[0] });\n    } else {\n      res.status(401).json({ error: 'Invalid credentials' });\n    }\n  });\n});",
+      "expected_output": "Should identify SQL injection as critical, plain-text password storage/comparison, exposing full user object in response, exposing DB error details, and missing rate limiting",
+      "expectations": [
+        "Review identifies the SQL injection vulnerability via string interpolation as a 🔴 Critical security issue",
+        "Review explains the specific attack vector (e.g., ' OR '1'='1 to bypass authentication)",
+        "Review identifies that passwords appear to be stored and compared in plain text instead of using bcrypt/argon2 hashing",
+        "Review notes that the full user object (including password) is returned in the login response",
+        "Review notes that internal database error messages are exposed to the client",
+        "Review suggests parameterized queries as the fix for SQL injection",
+        "Review provides concrete code fixes with examples",
+        "Review follows the structured output template with severity classifications"
+      ]
+    },
+    {
+      "id": 11,
+      "files": [],
+      "prompt": "Review these two Python test files for a calculator module:\n\n# test_calculator.py\nimport pytest\nfrom calculator import Calculator\n\nclass TestCalculator:\n    def test_add(self):\n        calc = Calculator()\n        calc.add(2, 3)\n\n    def test_subtract(self):\n        calc = Calculator()\n        result = calc.subtract(10, 4)\n        assert result == 6\n\n    def test_divide(self):\n        calc = Calculator()\n        assert calc.divide(10, 2) == 5\n\n    def test_multiply(self):\n        calc = Calculator()\n        result = calc.multiply(3, 4)\n        assert result == 12\n\n    def test_operations(self):\n        calc = Calculator()\n        assert calc.add(1, 1) == 2\n        assert calc.subtract(5, 3) == 2\n        assert calc.multiply(2, 3) == 6\n        assert calc.divide(10, 5) == 2\n        assert calc.add(-1, -1) == -2\n        assert calc.multiply(0, 100) == 0\n\n# test_advanced.py\nimport time\nfrom unittest import TestCase\nfrom calculator import Calculator\n\nshared_calc = Calculator()\n\nclass TestAdvanced(TestCase):\n    def test_performance(self):\n        start = time.time()\n        for i in range(1000):\n            shared_calc.add(i, i)\n        elapsed = time.time() - start\n        assert elapsed < 1.0\n\n    def test_chained(self):\n        result = shared_calc.add(shared_calc.multiply(2, 3), shared_calc.subtract(10, 5))\n        assert result == 11",
+      "expected_output": "Should identify assertion-free test, shared mutable state, god test with too many assertions, mixing unittest.TestCase with pytest, missing edge case tests, timing-dependent test",
+      "expectations": [
+        "Review identifies test_add as an assertion-free test that will pass even if add() returns wrong results",
+        "Review identifies test_operations as testing too many concepts in a single test (god test)",
+        "Review identifies shared_calc as shared mutable state between tests, causing potential test ordering dependencies",
+        "Review identifies the timing-dependent test_performance as a flaky test pattern",
+        "Review notes that unittest.TestCase is used in test_advanced.py when pytest is the project's test framework",
+        "Review identifies missing edge case tests (division by zero, negative numbers, large numbers, float inputs)",
+        "Review suggests using pytest fixtures instead of shared module-level state",
+        "Review follows the structured output template with severity classifications"
+      ]
+    },
+    {
+      "id": 12,
+      "files": [],
+      "prompt": "I want a security-focused review of this Python Flask endpoint. ${input:focus:security}\n\nfrom flask import Flask, request, redirect\nimport subprocess\nimport sqlite3\nimport os\n\napp = Flask(__name__)\n\n@app.route('/search')\ndef search():\n    q = request.args.get('q', '')\n    conn = sqlite3.connect('app.db')\n    results = conn.execute(f\"SELECT * FROM products WHERE name LIKE '%{q}%'\").fetchall()\n    conn.close()\n    return f\"<h1>Results for {q}</h1><ul>{''.join(f'<li>{r[1]}</li>' for r in results)}</ul>\"\n\n@app.route('/export')\ndef export():\n    fmt = request.args.get('format', 'csv')\n    output = subprocess.check_output(f'python export.py --format {fmt}', shell=True)\n    return output\n\n@app.route('/redirect')\ndef do_redirect():\n    url = request.args.get('url', '/')\n    return redirect(url)",
+      "expected_output": "Should identify SQL injection, XSS, command injection, open redirect, and missing input validation — with extra depth on security due to focus area parameter",
+      "expectations": [
+        "Review identifies the SQL injection in the search endpoint via f-string interpolation as 🔴 Critical",
+        "Review identifies the reflected XSS in the search endpoint where user input q is rendered directly in HTML without escaping",
+        "Review identifies the command injection in the export endpoint via shell=True with user input as 🔴 Critical",
+        "Review identifies the open redirect vulnerability in the redirect endpoint",
+        "Review provides concrete fixes for each vulnerability (parameterized queries, HTML escaping, subprocess with list args, URL allowlist)",
+        "Review mentions at least 4 distinct security vulnerabilities in its analysis given the security focus area parameter",
+        "Review consults or applies knowledge from the security checklist reference",
+        "Review follows the structured output template with severity classifications"
+      ]
+    },
+    {
+      "id": 13,
+      "files": [],
+      "prompt": "Review this PR diff that modifies the user service and its controller across two files:\n\n```diff\n--- a/src/services/userService.ts\n+++ b/src/services/userService.ts\n@@ -1,10 +1,25 @@\n import { db } from '../db';\n+import { redis } from '../cache';\n \n export class UserService {\n-  async getUser(id: string) {\n-    return db.users.findUnique({ where: { id } });\n+  async getUser(id: string) {\n+    const cached = await redis.get(`user:${id}`);\n+    if (cached) return JSON.parse(cached);\n+    const user = await db.users.findUnique({ where: { id } });\n+    await redis.set(`user:${id}`, JSON.stringify(user));\n+    return user;\n   }\n \n   async updateUser(id: string, data: Partial<User>) {\n     return db.users.update({ where: { id }, data });\n   }\n+\n+  async deleteUser(id: string) {\n+    await db.users.delete({ where: { id } });\n+  }\n+\n+  async listUsers(page: number) {\n+    return db.users.findMany({\n+      skip: page * 100,\n+      take: 100,\n+    });\n+  }\n }\n\n--- a/src/controllers/userController.ts\n+++ b/src/controllers/userController.ts\n@@ -8,6 +8,16 @@ export class UserController {\n     const user = await this.userService.getUser(req.params.id);\n     res.json(user);\n   }\n+\n+  async delete(req: Request, res: Response) {\n+    await this.userService.deleteUser(req.params.id);\n+    res.status(204).send();\n+  }\n+\n+  async list(req: Request, res: Response) {\n+    const users = await this.userService.listUsers(Number(req.query.page));\n+    res.json(users);\n+  }\n }\n```",
+      "expected_output": "Should identify cache invalidation missing on update/delete, stale cache serving null for non-existent users, missing auth on delete, NaN risk on page parameter, and no error handling",
+      "expectations": [
+        "Review identifies that updateUser and deleteUser do not invalidate the Redis cache, causing stale data to be served",
+        "Review identifies that when getUser finds no user (null), it caches null, meaning subsequent requests will get JSON.parse of 'null' instead of fetching fresh data",
+        "Review identifies the delete endpoint lacks authorization checks — any user can delete any other user",
+        "Review identifies that Number(req.query.page) can produce NaN when page parameter is missing or non-numeric",
+        "Review identifies that none of the controller methods have error handling (try/catch)",
+        "Review organizes findings by severity rather than by file, as recommended for multi-file reviews",
+        "Review provides concrete code fixes",
+        "Review follows the structured output template with Summary, Critical Issues, Suggestions, Good Practices, and Metrics sections including a verdict"
+      ]
+    },
+    {
+      "id": 14,
+      "files": [],
+      "prompt": "Review this React component for accessibility issues — it's a modal dialog for our checkout flow:\n\n```tsx\nimport React, { useState } from 'react';\n\nfunction CheckoutModal({ isOpen, onClose, onConfirm, items }) {\n  const [agreed, setAgreed] = useState(false);\n\n  if (!isOpen) return null;\n\n  return (\n    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)' }} onClick={onClose}>\n      <div style={{ background: 'white', margin: '100px auto', padding: 20, width: 500 }} onClick={e => e.stopPropagation()}>\n        <div style={{ fontSize: 24, fontWeight: 'bold' }}>Confirm Purchase</div>\n        <div style={{ color: 'red' }}>Required fields are marked in red</div>\n        <ul>\n          {items.map(item => (\n            <li>{item.name} - ${item.price}</li>\n          ))}\n        </ul>\n        <div>\n          <div onClick={() => setAgreed(!agreed)} style={{ cursor: 'pointer', color: agreed ? 'green' : 'gray' }}>\n            {agreed ? '☑' : '☐'} I agree to the terms\n          </div>\n        </div>\n        <img src=\"/icons/secure-badge.png\" />\n        <div>\n          <div onClick={onClose} style={{ cursor: 'pointer', display: 'inline-block', padding: '10px 20px', background: '#ccc' }}>Cancel</div>\n          <div onClick={onConfirm} style={{ cursor: 'pointer', display: 'inline-block', padding: '10px 20px', background: agreed ? '#4CAF50' : '#ccc', color: 'white' }}>Purchase</div>\n        </div>\n      </div>\n    </div>\n  );\n}\n\nexport default CheckoutModal;\n```",
+      "expected_output": "Should identify multiple accessibility issues: non-semantic HTML (div instead of dialog/button), missing keyboard accessibility, color-only information, missing alt text, no focus trap, no ARIA attributes, missing form labels",
+      "expectations": [
+        "Review identifies that div elements are used as buttons instead of semantic <button> elements, making them inaccessible to keyboard and screen reader users",
+        "Review identifies that the modal lacks focus trap — keyboard users can tab behind the modal into hidden content",
+        "Review identifies the missing alt attribute on the security badge image",
+        "Review identifies that 'red' is used as the sole indicator for required fields (color-only information)",
+        "Review identifies that the checkbox is a div with onClick instead of an actual <input type='checkbox'> or element with role='checkbox' and proper keyboard handling",
+        "Review identifies that the modal overlay has no role='dialog' or aria-modal='true' attribute",
+        "Review identifies missing key prop in the items.map() rendering",
+        "Review provides concrete fixes using semantic HTML elements and proper ARIA attributes"
+      ]
+    },
+    {
+      "id": 15,
+      "files": [],
+      "prompt": "I need a performance-focused review of this data processing module. ${input:focus:performance}\n\n```typescript\nimport { db } from '../database';\n\nexport async function generateReport(orgId: string) {\n  const users = await db.users.findMany({ where: { orgId } });\n\n  const report = [];\n  for (const user of users) {\n    const orders = await db.orders.findMany({ where: { userId: user.id } });\n    const reviews = await db.reviews.findMany({ where: { userId: user.id } });\n\n    const totalSpent = orders.reduce((sum, o) => sum + o.amount, 0);\n    const avgRating = reviews.length > 0\n      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length\n      : 0;\n\n    const rank = users.filter(u => {\n      const uOrders = orders; // bug: should fetch this user's orders\n      return uOrders.reduce((s, o) => s + o.amount, 0) > totalSpent;\n    }).length + 1;\n\n    report.push({\n      name: user.name,\n      email: user.email,\n      totalSpent,\n      avgRating,\n      rank,\n      orders: JSON.parse(JSON.stringify(orders)),\n    });\n  }\n\n  return report;\n}\n```",
+      "expected_output": "Should identify N+1 query problem, O(n^2) rank computation, unnecessary deep clone, sequential async operations, correctness bug in rank calculation, and missing pagination",
+      "expectations": [
+        "Review identifies the N+1 query problem — two DB queries per user inside the loop",
+        "Review identifies the O(n^2) rank computation (filtering all users for each user)",
+        "Review identifies the correctness bug in rank calculation where it reuses the current user's orders instead of fetching each user's orders",
+        "Review identifies JSON.parse(JSON.stringify(orders)) as an unnecessary deep clone with performance cost",
+        "Review suggests using batch queries or JOINs instead of per-user queries",
+        "Review mentions at least 3 distinct performance issues (e.g., N+1 queries, O(n^2) complexity, unnecessary deep clone) given the performance focus area parameter",
+        "Review provides concrete code fixes showing batch query pattern or Promise.all approach",
+        "Review follows the structured output template with severity classifications"
+      ]
+    },
+    {
+      "id": 16,
+      "files": [],
+      "prompt": "Review these test files for our payment service. ${input:focus:testing}\n\n```csharp\n// PaymentServiceTests.cs\nusing Xunit;\nusing Moq;\nusing FluentAssertions;\n\npublic class PaymentServiceTests\n{\n    private readonly Mock<IPaymentGateway> _gatewayMock = new();\n    private readonly Mock<IOrderRepository> _orderRepoMock = new();\n    private readonly Mock<ILogger<PaymentService>> _loggerMock = new();\n    private readonly Mock<IEmailService> _emailMock = new();\n    private readonly Mock<IConfig> _configMock = new();\n    private readonly PaymentService _sut;\n\n    public PaymentServiceTests()\n    {\n        _configMock.Setup(c => c.GetValue(\"MaxRetries\")).Returns(\"3\");\n        _configMock.Setup(c => c.GetValue(\"Currency\")).Returns(\"USD\");\n        _sut = new PaymentService(\n            _gatewayMock.Object, _orderRepoMock.Object,\n            _loggerMock.Object, _emailMock.Object, _configMock.Object);\n    }\n\n    [Fact]\n    public async Task ProcessPayment_ShouldWork()\n    {\n        // Arrange\n        var order = new Order { Id = 1, Amount = 100, UserId = \"user1\" };\n        _gatewayMock.Setup(g => g.Charge(It.IsAny<decimal>(), It.IsAny<string>()))\n            .ReturnsAsync(new PaymentResult { Success = true, TransactionId = \"tx1\" });\n        _orderRepoMock.Setup(r => r.GetById(1)).ReturnsAsync(order);\n\n        // Act\n        var result = await _sut.ProcessPayment(1, \"card_token\");\n\n        // Assert\n        result.Should().NotBeNull();\n    }\n\n    [Fact]\n    public async Task ProcessPayment_WhenGatewayFails_ShouldRetry()\n    {\n        var order = new Order { Id = 1, Amount = 100, UserId = \"user1\" };\n        _orderRepoMock.Setup(r => r.GetById(1)).ReturnsAsync(order);\n        _gatewayMock.SetupSequence(g => g.Charge(It.IsAny<decimal>(), It.IsAny<string>()))\n            .ThrowsAsync(new GatewayTimeoutException())\n            .ThrowsAsync(new GatewayTimeoutException())\n            .ReturnsAsync(new PaymentResult { Success = true });\n\n        var result = await _sut.ProcessPayment(1, \"card_token\");\n\n        result.Success.Should().BeTrue();\n        _gatewayMock.Verify(g => g.Charge(It.IsAny<decimal>(), It.IsAny<string>()), Times.Exactly(3));\n    }\n\n    [Fact]\n    public async Task ProcessPayment_InvalidOrder_ShouldFail()\n    {\n        _orderRepoMock.Setup(r => r.GetById(999)).ReturnsAsync((Order)null);\n\n        var act = () => _sut.ProcessPayment(999, \"card_token\");\n\n        await act.Should().ThrowAsync<OrderNotFoundException>();\n    }\n\n    // TODO: add more tests later\n}\n```",
+      "expected_output": "Should identify excessive mocking (5 mocks), weak assertion in first test, mocking IConfig instead of using real values, It.IsAny overuse hiding real parameter expectations, missing edge case tests, TODO comment",
+      "expectations": [
+        "Review identifies excessive mocking — 5 mock dependencies suggests the class under test may have too many responsibilities",
+        "Review identifies the weak assertion in ProcessPayment_ShouldWork — only checks NotBeNull instead of verifying the actual payment result properties",
+        "Review identifies mocking IConfig as unnecessary — a real config object or simple stub would be simpler and more readable",
+        "Review identifies overuse of It.IsAny<> which accepts any arguments, potentially hiding bugs where wrong values are passed",
+        "Review notes the TODO comment indicating incomplete test coverage",
+        "Review identifies missing test cases: payment with zero/negative amount, duplicate payment, concurrent payment for same order",
+        "Review mentions at least 3 distinct testing anti-patterns or improvement areas given the testing focus area parameter",
+        "Review follows the structured output template with severity classifications"
+      ]
+    },
+    {
+      "id": 17,
+      "files": [],
+      "prompt": "hey so I used copilot to generate this authentication module and it seems to work in my local tests but I want to make sure it's actually solid before we deploy:\n\n```python\nimport jwt\nimport hashlib\nfrom datetime import datetime, timedelta\nfrom flask import Flask, request, jsonify\n\napp = Flask(__name__)\nSECRET_KEY = \"my-super-secret-key-2024\"\n\ndef hash_password(password):\n    return hashlib.md5(password.encode()).hexdigest()\n\ndef verify_password(password, hashed):\n    return hash_password(password) == hashed\n\ndef create_token(user_id, role):\n    payload = {\n        'user_id': user_id,\n        'role': role,\n        'exp': datetime.now() + timedelta(days=30)\n    }\n    return jwt.encode(payload, SECRET_KEY, algorithm='HS256')\n\ndef require_auth(f):\n    def decorated(*args, **kwargs):\n        token = request.headers.get('Authorization')\n        if not token:\n            return jsonify({'error': 'Missing token'}), 401\n        try:\n            data = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])\n            request.user = data\n        except:\n            return jsonify({'error': 'Invalid token'}), 401\n        return f(*args, **kwargs)\n    return decorated\n\n@app.route('/register', methods=['POST'])\ndef register():\n    data = request.get_json()\n    username = data['username']\n    password = data['password']\n    hashed = hash_password(password)\n    # TODO: save to database\n    user_id = 1  # placeholder\n    token = create_token(user_id, 'user')\n    return jsonify({'token': token})\n\n@app.route('/login', methods=['POST'])\ndef login():\n    data = request.get_json()\n    username = data['username']\n    password = data['password']\n    # TODO: fetch from database\n    stored_hash = 'placeholder'\n    if verify_password(password, stored_hash):\n        token = create_token(1, 'admin')\n        return jsonify({'token': token})\n    return jsonify({'error': 'Bad credentials'}), 401\n\n@app.route('/admin', methods=['GET'])\n@require_auth\ndef admin_panel():\n    return jsonify({'message': 'Welcome admin', 'users': get_all_users()})\n```",
+      "expected_output": "Should identify AI-generated code hallmarks: MD5 for password hashing, hardcoded secret key, 30-day token expiry, bare except, missing rate limiting, TODO placeholders, missing authorization check on admin endpoint, datetime.now vs utcnow",
+      "expectations": [
+        "Review identifies MD5 as an insecure password hashing algorithm and recommends bcrypt/argon2",
+        "Review identifies the hardcoded SECRET_KEY in source code as a critical security issue",
+        "Review identifies the 30-day JWT expiry as excessively long",
+        "Review identifies the bare except clause in require_auth that swallows all errors",
+        "Review identifies that the admin endpoint has authentication but no authorization — any logged-in user can access it regardless of role",
+        "Review identifies the TODO placeholder comments indicating incomplete implementation",
+        "Review identifies datetime.now() should be datetime.utcnow() for JWT expiry",
+        "Review notes characteristics typical of AI-generated code (looks correct at first glance but has systematic security gaps)"
+      ]
+    },
+    {
+      "id": 18,
+      "files": [],
+      "prompt": "Review this PR diff — it's a large refactor of our order processing pipeline. We moved from a monolithic service to a pipeline pattern. Here are the key files changed (+342 -189):\n\n```diff\n--- a/src/services/orderProcessor.ts\n+++ b/src/services/orderProcessor.ts\n@@ -1,45 +1,12 @@\n-import { db } from '../db';\n-import { paymentService } from './paymentService';\n-import { inventoryService } from './inventoryService';\n-import { notificationService } from './notificationService';\n-import { logger } from '../utils/logger';\n-\n-export class OrderProcessor {\n-  async processOrder(orderId: string, userId: string) {\n-    const order = await db.orders.findUnique({ where: { id: orderId } });\n-    if (!order) throw new Error('Order not found');\n-\n-    // Validate inventory\n-    for (const item of order.items) {\n-      const available = await inventoryService.check(item.productId);\n-      if (available < item.quantity) {\n-        throw new Error(`Insufficient inventory for ${item.productId}`);\n-      }\n-    }\n-\n-    // Process payment\n-    const payment = await paymentService.charge(userId, order.total);\n-    if (!payment.success) {\n-      throw new Error('Payment failed');\n-    }\n-\n-    // Reserve inventory\n-    for (const item of order.items) {\n-      await inventoryService.reserve(item.productId, item.quantity);\n-    }\n-\n-    // Update order status\n-    await db.orders.update({ where: { id: orderId }, data: { status: 'confirmed', paymentId: payment.id } });\n-\n-    // Send confirmation\n-    await notificationService.sendOrderConfirmation(userId, orderId);\n-\n-    return { success: true, paymentId: payment.id };\n-  }\n-}\n+export { OrderPipeline } from './pipeline/OrderPipeline';\n+export type { PipelineStep, PipelineContext } from './pipeline/types';\n\n--- /dev/null\n+++ b/src/services/pipeline/types.ts\n@@ -0,0 +1,22 @@\n+export interface PipelineContext {\n+  orderId: string;\n+  userId: string;\n+  order?: Order;\n+  payment?: PaymentResult;\n+  error?: Error;\n+  metadata: Record<string, unknown>;\n+}\n+\n+export interface PipelineStep {\n+  name: string;\n+  execute(ctx: PipelineContext): Promise<PipelineContext>;\n+  rollback?(ctx: PipelineContext): Promise<void>;\n+}\n+\n+export interface PipelineConfig {\n+  steps: PipelineStep[];\n+  maxRetries: number;\n+  timeoutMs: number;\n+  onError?: (step: string, error: Error, ctx: PipelineContext) => void;\n+}\n\n--- /dev/null\n+++ b/src/services/pipeline/OrderPipeline.ts\n@@ -0,0 +1,68 @@\n+import { PipelineContext, PipelineStep, PipelineConfig } from './types';\n+import { logger } from '../../utils/logger';\n+\n+export class OrderPipeline {\n+  private steps: PipelineStep[] = [];\n+  private config: PipelineConfig;\n+  private completedSteps: PipelineStep[] = [];\n+\n+  constructor(config: PipelineConfig) {\n+    this.config = config;\n+    this.steps = config.steps;\n+  }\n+\n+  async execute(orderId: string, userId: string): Promise<PipelineContext> {\n+    const ctx: PipelineContext = { orderId, userId, metadata: {} };\n+\n+    for (const step of this.steps) {\n+      try {\n+        logger.info(`Executing step: ${step.name}`);\n+        const result = await step.execute(ctx);\n+        Object.assign(ctx, result);\n+        this.completedSteps.push(step);\n+      } catch (error) {\n+        logger.error(`Step ${step.name} failed:`, error);\n+        ctx.error = error as Error;\n+        this.config.onError?.(step.name, error as Error, ctx);\n+        await this.rollback(ctx);\n+        throw error;\n+      }\n+    }\n+\n+    return ctx;\n+  }\n+\n+  private async rollback(ctx: PipelineContext): Promise<void> {\n+    for (const step of this.completedSteps.reverse()) {\n+      try {\n+        if (step.rollback) {\n+          await step.rollback(ctx);\n+        }\n+      } catch (rollbackError) {\n+        logger.error(`Rollback failed for step ${step.name}:`, rollbackError);\n+      }\n+    }\n+  }\n+}\n\n--- /dev/null\n+++ b/src/services/pipeline/steps/ValidateInventoryStep.ts\n@@ -0,0 +1,25 @@\n+import { PipelineStep, PipelineContext } from '../types';\n+import { inventoryService } from '../../inventoryService';\n+\n+export class ValidateInventoryStep implements PipelineStep {\n+  name = 'validate-inventory';\n+\n+  async execute(ctx: PipelineContext): Promise<PipelineContext> {\n+    const order = ctx.order!;\n+    for (const item of order.items) {\n+      const available = await inventoryService.check(item.productId);\n+      if (available < item.quantity) {\n+        throw new Error(`Insufficient inventory for ${item.productId}`);\n+      }\n+    }\n+    return ctx;\n+  }\n+}\n\n--- /dev/null\n+++ b/src/services/pipeline/steps/ProcessPaymentStep.ts\n@@ -0,0 +1,34 @@\n+import { PipelineStep, PipelineContext } from '../types';\n+import { paymentService } from '../../paymentService';\n+\n+export class ProcessPaymentStep implements PipelineStep {\n+  name = 'process-payment';\n+\n+  async execute(ctx: PipelineContext): Promise<PipelineContext> {\n+    const payment = await paymentService.charge(ctx.userId, ctx.order!.total);\n+    if (!payment.success) {\n+      throw new Error('Payment processing failed');\n+    }\n+    ctx.payment = payment;\n+    return ctx;\n+  }\n+\n+  async rollback(ctx: PipelineContext): Promise<void> {\n+    if (ctx.payment?.id) {\n+      await paymentService.refund(ctx.payment.id);\n+    }\n+  }\n+}\n\n--- /dev/null\n+++ b/src/services/pipeline/steps/ReserveInventoryStep.ts\n@@ -0,0 +1,30 @@\n+import { PipelineStep, PipelineContext } from '../types';\n+import { inventoryService } from '../../inventoryService';\n+\n+export class ReserveInventoryStep implements PipelineStep {\n+  name = 'reserve-inventory';\n+\n+  async execute(ctx: PipelineContext): Promise<PipelineContext> {\n+    const order = ctx.order!;\n+    for (const item of order.items) {\n+      await inventoryService.reserve(item.productId, item.quantity);\n+    }\n+    ctx.metadata.inventoryReserved = true;\n+    return ctx;\n+  }\n+\n+  async rollback(ctx: PipelineContext): Promise<void> {\n+    if (ctx.metadata.inventoryReserved && ctx.order) {\n+      for (const item of ctx.order.items) {\n+        await inventoryService.release(item.productId, item.quantity);\n+      }\n+    }\n+  }\n+}\n\n--- a/src/services/pipeline/steps/UpdateOrderStep.ts\n+++ b/src/services/pipeline/steps/UpdateOrderStep.ts\n@@ -0,0 +1,20 @@\n+import { PipelineStep, PipelineContext } from '../types';\n+import { db } from '../../../db';\n+\n+export class UpdateOrderStep implements PipelineStep {\n+  name = 'update-order';\n+\n+  async execute(ctx: PipelineContext): Promise<PipelineContext> {\n+    await db.orders.update({\n+      where: { id: ctx.orderId },\n+      data: { status: 'confirmed', paymentId: ctx.payment!.id },\n+    });\n+    return ctx;\n+  }\n+}\n```\n\nThis is 6 files changed, +342 lines, -189 lines.",
+      "expected_output": "Should identify architecture-level observations first (pipeline pattern is good, separation of concerns improved), then drill into specifics: completedSteps is mutable instance state (not safe for concurrent pipeline executions), .reverse() mutates the array, non-null assertions (!), missing timeout implementation, missing notification step from original, ValidateInventoryStep has N+1 queries, UpdateOrderStep has no rollback",
+      "expectations": [
+        "Review starts with architecture-level observations as recommended for large changes (>300 lines)",
+        "Review identifies that completedSteps is instance state — if the pipeline is reused across requests, completed steps from a previous execution leak into the next one",
+        "Review identifies that .reverse() mutates the completedSteps array in place, which could cause issues if the array is referenced elsewhere",
+        "Review identifies the excessive non-null assertions (ctx.order!) throughout the steps — if a step is reordered, this will crash at runtime instead of failing gracefully",
+        "Review identifies that the notification step from the original code was removed but not replaced in the pipeline",
+        "Review identifies that PipelineConfig has maxRetries and timeoutMs fields but neither is implemented in OrderPipeline.execute()",
+        "Review identifies that UpdateOrderStep lacks a rollback method — if a later step fails, the order status remains 'confirmed'",
+        "Review explicitly notes which sections were reviewed in depth vs. scanned, as SKILL.md recommends for large PRs"
+      ]
+    },
+    {
+      "id": 19,
+      "files": [],
+      "prompt": "Review this GitHub Actions workflow and Terraform config for our production deployment pipeline:\n\n```yaml\n# .github/workflows/deploy.yml\nname: Deploy to Production\non:\n  push:\n    branches: [main]\n\njobs:\n  deploy:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n\n      - name: Setup Terraform\n        uses: hashicorp/setup-terraform@v2\n\n      - name: Terraform Init\n        run: terraform init\n        env:\n          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_KEY }}\n          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET }}\n\n      - name: Terraform Apply\n        run: terraform apply -auto-approve\n        env:\n          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_KEY }}\n          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET }}\n          TF_VAR_db_password: admin123\n\n      - name: Run migrations\n        run: |\n          ssh -o StrictHostKeyChecking=no ec2-user@${{ steps.terraform.outputs.server_ip }} \\\n            \"cd /app && ./migrate.sh\"\n\n      - name: Notify\n        if: always()\n        run: curl -X POST ${{ secrets.SLACK_WEBHOOK }} -d '{\"text\": \"Deploy finished\"}'\n```\n\n```hcl\n# main.tf\nresource \"aws_security_group\" \"web\" {\n  name = \"web-sg\"\n\n  ingress {\n    from_port   = 0\n    to_port     = 65535\n    protocol    = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n\n  egress {\n    from_port   = 0\n    to_port     = 0\n    protocol    = \"-1\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n}\n\nresource \"aws_instance\" \"web\" {\n  ami           = \"ami-12345678\"\n  instance_type = \"t2.micro\"\n  key_name      = \"my-key\"\n  security_groups = [aws_security_group.web.name]\n\n  user_data = <<-EOF\n    #!/bin/bash\n    curl https://raw.githubusercontent.com/company/scripts/main/setup.sh | bash\n  EOF\n}\n\nresource \"aws_db_instance\" \"main\" {\n  engine         = \"mysql\"\n  instance_class = \"db.t3.micro\"\n  username       = \"admin\"\n  password       = \"admin123\"\n  publicly_accessible = true\n  skip_final_snapshot = true\n}\n```",
+      "expected_output": "Should identify security group opening all ports, hardcoded DB password in both TF and workflow, publicly accessible RDS, piping remote script to bash, no terraform plan step, disabled SSH host key checking, auto-approve without plan, pinned action versions missing",
+      "expectations": [
+        "Review identifies the security group allowing all TCP ports (0-65535) from all IPs (0.0.0.0/0) as a 🔴 Critical security issue",
+        "Review identifies the hardcoded database password 'admin123' in both the Terraform config and the GitHub Actions env var",
+        "Review identifies that the RDS instance is publicly accessible, which exposes the database to the internet",
+        "Review identifies the `curl | bash` pattern in user_data as a supply chain security risk",
+        "Review identifies that `terraform apply -auto-approve` runs without a preceding `terraform plan` review step",
+        "Review identifies `-o StrictHostKeyChecking=no` in the SSH command as disabling host key verification",
+        "Review identifies that GitHub Actions versions are not pinned to SHA hashes (e.g., actions/checkout@v3 should use a commit SHA)",
+        "Review provides concrete fixes for the infrastructure security issues",
+        "Review follows the structured output template with severity classifications"
+      ]
+    },
+    {
+      "id": 20,
+      "files": [],
+      "prompt": "Review this Java concurrent order processing service:\n\n```java\nimport java.util.*;\nimport java.util.concurrent.*;\n\npublic class OrderProcessingService {\n    private final Map<String, Order> activeOrders = new HashMap<>();\n    private final ExecutorService executor = Executors.newFixedThreadPool(10);\n    private double totalRevenue = 0;\n\n    public void submitOrder(Order order) {\n        activeOrders.put(order.getId(), order);\n        executor.submit(() -> processOrder(order));\n    }\n\n    private void processOrder(Order order) {\n        try {\n            Thread.sleep(100); // simulate processing\n            order.setStatus(\"PROCESSING\");\n\n            double amount = order.getAmount();\n            totalRevenue += amount;\n\n            if (totalRevenue > 1_000_000) {\n                pauseProcessing();\n            }\n\n            order.setStatus(\"COMPLETED\");\n            activeOrders.remove(order.getId());\n        } catch (InterruptedException e) {\n            order.setStatus(\"FAILED\");\n        }\n    }\n\n    public List<Order> getActiveOrders() {\n        return new ArrayList<>(activeOrders.values());\n    }\n\n    public double getTotalRevenue() {\n        return totalRevenue;\n    }\n\n    private void pauseProcessing() {\n        executor.shutdown();\n    }\n\n    public void shutdown() {\n        executor.shutdown();\n    }\n}\n```",
+      "expected_output": "Should identify HashMap used without synchronization from multiple threads, non-atomic double increment (totalRevenue += amount), executor.shutdown() in pauseProcessing kills the thread pool for all future orders, no volatile/atomic on shared state, InterruptedException not re-setting interrupt flag",
+      "expectations": [
+        "Review identifies that HashMap is not thread-safe and is accessed from multiple threads (submitOrder and processOrder) causing potential data corruption — should use ConcurrentHashMap",
+        "Review identifies the non-atomic `totalRevenue += amount` as a race condition — concurrent threads can read stale values and lose updates — should use AtomicDouble or synchronized access",
+        "Review identifies that `pauseProcessing()` calls `executor.shutdown()` which permanently stops the thread pool, preventing all future order processing",
+        "Review identifies that the InterruptedException handler does not restore the interrupt flag via `Thread.currentThread().interrupt()`",
+        "Review identifies that `order.setStatus()` is called from the executor thread without synchronization while the order may be read from the main thread via `getActiveOrders()`",
+        "Review suggests using `ConcurrentHashMap`, `AtomicReference` or `LongAdder`, and proper synchronization primitives as fixes",
+        "Review provides concrete Java code fixes for at least 2 of the concurrency issues",
+        "Review follows the structured output template with severity classifications"
+      ]
+    },
+    {
+      "id": 21,
+      "files": [],
+      "prompt": "Review this PHP controller from our Laravel app:\n\n```php\n<?php\n\nnamespace App\\Http\\Controllers;\n\nuse Illuminate\\Http\\Request;\nuse Illuminate\\Support\\Facades\\DB;\n\nclass ProductController extends Controller\n{\n    public function search(Request $request)\n    {\n        $query = $request->input('q');\n        $category = $request->input('category', 'all');\n        \n        $results = DB::select(\"SELECT * FROM products WHERE name LIKE '%$query%' AND category = '$category'\");\n        \n        $html = '<div class=\"results\">';\n        foreach ($results as $product) {\n            $html .= \"<div class='product'>\";\n            $html .= \"<h3>{$product->name}</h3>\";\n            $html .= \"<p>Price: \\${$product->price}</p>\";\n            $html .= \"<p>{$product->description}</p>\";\n            $html .= \"</div>\";\n        }\n        $html .= '</div>';\n        \n        return response($html);\n    }\n\n    public function delete($id)\n    {\n        DB::delete(\"DELETE FROM products WHERE id = $id\");\n        return redirect('/products');\n    }\n\n    public function upload(Request $request)\n    {\n        $file = $request->file('image');\n        $filename = $file->getClientOriginalName();\n        $file->move(public_path('uploads'), $filename);\n        \n        DB::insert(\"INSERT INTO products (name, image) VALUES ('{$request->input('name')}', '$filename')\");\n        \n        return redirect('/products');\n    }\n}\n```",
+      "expected_output": "Should identify SQL injection in all three methods, XSS via unescaped HTML output, missing CSRF protection, file upload without validation, using user-supplied filename directly, not using Eloquent ORM or query builder",
+      "expectations": [
+        "Review identifies SQL injection in the search method via string interpolation as 🔴 Critical and recommends parameterized queries or Eloquent",
+        "Review identifies stored XSS via rendering product name and description in raw HTML without htmlspecialchars() or Blade escaping",
+        "Review identifies the file upload accepting any file type with the original user-supplied filename as a security risk (path traversal, executable upload)",
+        "Review identifies SQL injection in the delete method — the $id parameter is not validated as integer",
+        "Review mentions that raw DB::select/insert/delete should use parameter binding or be replaced with Eloquent ORM",
+        "Review identifies missing authorization checks on the delete endpoint",
+        "Review provides concrete PHP code fixes using Laravel conventions (Eloquent, Blade templates, Form Requests)",
+        "Review follows the structured output template with severity classifications"
+      ]
+    },
+    {
+      "id": 22,
+      "files": [],
+      "prompt": "Review this Kotlin Android ViewModel:\n\n```kotlin\nclass UserViewModel : ViewModel() {\n    private var users = mutableListOf<User>()\n    private var isLoading = false\n    \n    fun loadUsers() {\n        isLoading = true\n        GlobalScope.launch {\n            try {\n                val response = RetrofitClient.api.getUsers()\n                users.clear()\n                users.addAll(response.body()!!)\n                isLoading = false\n            } catch (e: Exception) {\n                isLoading = false\n                println(\"Error loading users: $e\")\n            }\n        }\n    }\n    \n    fun deleteUser(id: String) {\n        GlobalScope.launch {\n            RetrofitClient.api.deleteUser(id)\n            users.removeAll { it.id == id }\n        }\n    }\n    \n    fun getFilteredUsers(query: String): List<User> {\n        return users.filter { it.name!!.lowercase().contains(query.lowercase()) }\n    }\n    \n    fun getUserCount(): Int = users.size\n    \n    lateinit var selectedUser: User\n    \n    fun selectUser(user: User) {\n        selectedUser = user\n    }\n    \n    fun getSelectedUserName(): String {\n        return selectedUser.name ?: \"Unknown\"\n    }\n}\n```",
+      "expected_output": "Should identify GlobalScope leak, non-null assertions (!!), mutable state not using LiveData/StateFlow, no error handling on delete, println for logging, lateinit misuse, no UI thread switching, missing null safety",
+      "expectations": [
+        "Review identifies GlobalScope.launch as a 🔴 Critical coroutine leak — should use viewModelScope which is cancelled when ViewModel is cleared",
+        "Review identifies the !! non-null assertion on response.body()!! that will crash with NPE if the response body is null",
+        "Review identifies that UI state (users, isLoading) uses plain mutable fields instead of LiveData or StateFlow — the UI cannot observe changes",
+        "Review identifies that it.name!! in getFilteredUsers will crash if any user has a null name",
+        "Review identifies lateinit var selectedUser will throw UninitializedPropertyAccessException if getSelectedUserName is called before selectUser",
+        "Review identifies missing error handling in deleteUser — network failures are silently ignored",
+        "Review provides concrete Kotlin code fixes using viewModelScope, StateFlow, and proper null handling",
+        "Review follows the structured output template with severity classifications"
+      ]
+    },
+    {
+      "id": 23,
+      "files": [],
+      "prompt": "Review this well-written Go HTTP middleware chain:\n\n```go\npackage middleware\n\nimport (\n\t\"context\"\n\t\"log/slog\"\n\t\"net/http\"\n\t\"time\"\n)\n\ntype contextKey string\n\nconst requestIDKey contextKey = \"requestID\"\n\nfunc RequestID(next http.Handler) http.Handler {\n\treturn http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {\n\t\tid := r.Header.Get(\"X-Request-ID\")\n\t\tif id == \"\" {\n\t\t\tid = generateUUID()\n\t\t}\n\t\tctx := context.WithValue(r.Context(), requestIDKey, id)\n\t\tw.Header().Set(\"X-Request-ID\", id)\n\t\tnext.ServeHTTP(w, r.WithContext(ctx))\n\t})\n}\n\nfunc Logging(logger *slog.Logger) func(http.Handler) http.Handler {\n\treturn func(next http.Handler) http.Handler {\n\t\treturn http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {\n\t\t\tstart := time.Now()\n\t\t\twrapped := &responseWriter{ResponseWriter: w, statusCode: http.StatusOK}\n\t\t\tnext.ServeHTTP(wrapped, r)\n\t\t\tlogger.Info(\"request completed\",\n\t\t\t\t\"method\", r.Method,\n\t\t\t\t\"path\", r.URL.Path,\n\t\t\t\t\"status\", wrapped.statusCode,\n\t\t\t\t\"duration\", time.Since(start),\n\t\t\t\t\"request_id\", r.Context().Value(requestIDKey),\n\t\t\t)\n\t\t})\n\t}\n}\n\ntype responseWriter struct {\n\thttp.ResponseWriter\n\tstatusCode int\n\twritten    bool\n}\n\nfunc (rw *responseWriter) WriteHeader(code int) {\n\tif !rw.written {\n\t\trw.statusCode = code\n\t\trw.written = true\n\t}\n\trw.ResponseWriter.WriteHeader(code)\n}\n```",
+      "expected_output": "This is well-written Go code. Review should be positive with minor suggestions. Should NOT manufacture false critical issues.",
+      "expectations": [
+        "Review recognizes this as well-written, idiomatic Go code and states so in the Summary",
+        "Review has zero Critical Issues — the code is correct and the review does NOT manufacture false problems",
+        "Review identifies at least 2 Good Practices (e.g., typed context key preventing collisions, structured logging with slog, response writer wrapping pattern, dependency injection of logger)",
+        "Review may suggest minor improvements (e.g., Hijacker/Flusher interface delegation, Write method to track bytes written) as Suggestions only",
+        "Review does NOT flag the code's style, naming, or structure as problems — it follows standard Go conventions",
+        "Review follows the structured output format with a 'Ready to merge' or 'Needs minor changes' verdict"
+      ]
+    },
+    {
+      "id": 24,
+      "files": [],
+      "prompt": "Review this short utility — just a quick one-liner:\n\n```python\ndef clamp(value, min_val, max_val):\n    return max(min_val, min(value, max_val))\n```",
+      "expected_output": "Very short, correct code. Review should be brief, mostly positive, and NOT over-analyze a simple utility.",
+      "expectations": [
+        "Review is appropriately brief for a small, correct utility — does not produce a lengthy analysis for a one-liner",
+        "Review has zero Critical Issues — this is a correct implementation of clamp",
+        "Review does NOT manufacture issues about missing type hints, docstrings, or input validation for this simple internal utility",
+        "Review identifies at least one Good Practice (e.g., concise, readable, correct boundary handling)",
+        "Review may optionally suggest edge case documentation (behavior when min_val > max_val) but classifies it as a minor Suggestion at most"
+      ]
+    }
+  ]
+}
