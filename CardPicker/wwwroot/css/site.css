@@ -19,6 +19,8 @@ html {
 
 body {
   margin-bottom: 60px;
+  background: #f7f4ee;
+  color: #2d2418;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -28,4 +30,122 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+.draw-page {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+.draw-page__header {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.draw-page__title {
+  margin-bottom: 0.5rem;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+}
+
+.draw-page__subtitle {
+  margin: 0;
+  color: #6a5946;
+}
+
+.draw-form,
+.draw-result {
+  padding: 1.5rem;
+  border: 1px solid #e7dac5;
+  border-radius: 1rem;
+  background: #fffdf9;
+  box-shadow: 0 0.75rem 2rem rgba(73, 49, 16, 0.08);
+}
+
+.draw-form__fieldset {
+  margin: 0 0 1rem;
+  padding: 0;
+  border: 0;
+}
+
+.draw-form__legend {
+  margin-bottom: 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.meal-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid #e7dac5;
+  border-radius: 0.875rem;
+  background: #fff;
+}
+
+.meal-choice + .meal-choice {
+  margin-top: 0.75rem;
+}
+
+.meal-choice__input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+}
+
+.meal-choice__label {
+  font-weight: 500;
+}
+
+.draw-form__submit {
+  min-width: 8rem;
+  padding: 0.8rem 1.2rem;
+  border: 0;
+  border-radius: 999px;
+  background: #d97706;
+  color: #fff;
+  font-weight: 600;
+}
+
+.draw-form__submit:hover {
+  background: #b85f00;
+}
+
+.draw-result {
+  margin-top: 1.5rem;
+}
+
+.draw-result--message {
+  border-color: #e8c17d;
+}
+
+.draw-result__message {
+  margin: 0 0 0.75rem;
+  color: #7c4a03;
+  font-weight: 600;
+}
+
+.draw-result__title {
+  margin-bottom: 1rem;
+}
+
+.draw-result__details {
+  margin: 0;
+}
+
+.draw-result__row {
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  gap: 0.75rem;
+}
+
+.draw-result__row + .draw-result__row {
+  margin-top: 0.75rem;
+}
+
+.draw-result__details dt,
+.draw-result__details dd {
+  margin: 0;
 }

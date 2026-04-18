@@ -1,10 +1,79 @@
 ﻿@page
+@using CardPicker.Models
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "餐點抽卡";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="draw-page">
+    <header class="draw-page__header">
+        <h1 class="draw-page__title">今天吃什麼？</h1>
+        <p class="draw-page__subtitle">選一個餐別，幫你從卡池中抽出今天的餐點。</p>
+    </header>
+
+    <form method="post" asp-page-handler="Draw" class="draw-form">
+        <fieldset class="draw-form__fieldset">
+            <legend class="draw-form__legend">請選擇餐別</legend>
+
+            <label class="meal-choice" for="mealType-breakfast">
+                <input
+                    class="meal-choice__input"
+                    id="mealType-breakfast"
+                    type="radio"
+                    name="SelectedMealType"
+                    value="@MealType.Breakfast"
+                    checked="@(Model.SelectedMealType == MealType.Breakfast)" />
+                <span class="meal-choice__label">早餐</span>
+            </label>
+
+            <label class="meal-choice" for="mealType-lunch">
+                <input
+                    class="meal-choice__input"
+                    id="mealType-lunch"
+                    type="radio"
+                    name="SelectedMealType"
+                    value="@MealType.Lunch"
+                    checked="@(Model.SelectedMealType == MealType.Lunch)" />
+                <span class="meal-choice__label">午餐</span>
+            </label>
+
+            <label class="meal-choice" for="mealType-dinner">
+                <input
+                    class="meal-choice__input"
+                    id="mealType-dinner"
+                    type="radio"
+                    name="SelectedMealType"
+                    value="@MealType.Dinner"
+                    checked="@(Model.SelectedMealType == MealType.Dinner)" />
+                <span class="meal-choice__label">晚餐</span>
+            </label>
+        </fieldset>
+
+        <button type="submit" class="draw-form__submit">抽一張</button>
+    </form>
+
+    @if (Model.DrawResult.State is DrawResultState.ValidationFailed or DrawResultState.EmptyPool)
+    {
+        <section class="draw-result draw-result--message" aria-live="polite">
+            <p class="draw-result__message">@Model.DrawResult.Message</p>
+        </section>
+    }
+    else if (Model.DrawResult.State == DrawResultState.Drawn)
+    {
+        <section class="draw-result draw-result--drawn" aria-live="polite">
+            <p class="draw-result__message">@Model.DrawResult.Message</p>
+            <h2 class="draw-result__title">@Model.DrawResult.CardName</h2>
+
+            <dl class="draw-result__details">
+                <div class="draw-result__row">
+                    <dt>餐別</dt>
+                    <dd>@IndexModel.GetMealTypeLabel(Model.DrawResult.MealType!.Value)</dd>
+                </div>
+                <div class="draw-result__row">
+                    <dt>說明</dt>
+                    <dd>@Model.DrawResult.Description</dd>
+                </div>
+            </dl>
+        </section>
+    }
+</section>

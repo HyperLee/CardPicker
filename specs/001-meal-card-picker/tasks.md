@@ -52,15 +52,15 @@
 
 **Gate**: `T012`、`T013` 完成並確認失敗後，必須先取得使用者批准，才能開始 `T014`-`T017`。
 
-- [ ] T012 [P] [US1] 建立 `CardPicker.Tests/Unit/Services/MealDrawServiceTests.cs`，先驗證未選餐別、空卡池、僅從指定餐別抽卡、固定亂數索引可覆蓋所有候選卡牌以證明等機率邏輯，與抽卡結果狀態轉換
-- [ ] T013 [P] [US1] 建立 `CardPicker.Tests/Integration/Pages/HomeDrawPageTests.cs`，先驗證首頁 `GET /` 與 `POST /?handler=Draw` 的抽卡流程、Anti-Forgery、CSP 與訊息輸出
+- [X] T012 [P] [US1] 建立 `CardPicker.Tests/Unit/Services/MealDrawServiceTests.cs`，先驗證未選餐別、空卡池、僅從指定餐別抽卡、固定亂數索引可覆蓋所有候選卡牌以證明等機率邏輯，與抽卡結果狀態轉換
+- [X] T013 [P] [US1] 建立 `CardPicker.Tests/Integration/Pages/HomeDrawPageTests.cs`，先驗證首頁 `GET /` 與 `POST /?handler=Draw` 的抽卡流程、Anti-Forgery、CSP 與訊息輸出
 
 ### Implementation for User Story 1
 
-- [ ] T014 [P] [US1] 建立 `CardPicker/Models/DrawRequest.cs`、`CardPicker/Models/DrawResult.cs`、`CardPicker/Models/DrawResultState.cs`、`CardPicker/Services/IRandomIndexProvider.cs` 與 `CardPicker/Services/CryptoRandomIndexProvider.cs`，定義抽卡輸入輸出與可測試、可重現的亂數索引抽象
-- [ ] T015 [US1] 建立 `CardPicker/Services/IMealDrawService.cs` 與 `CardPicker/Services/MealDrawService.cs`，實作餐別驗證、以索引均勻映射的等機率抽卡、抽卡操作記錄與空池處理
-- [ ] T016 [US1] 更新 `CardPicker/Program.cs` 與 `CardPicker/Pages/Index.cshtml.cs`，接上抽卡服務、PageModel 狀態與表單提交流程
-- [ ] T017 [US1] 更新 `CardPicker/Pages/Index.cshtml` 與 `CardPicker/wwwroot/css/site.css`，實作餐別選擇、抽卡結果卡片、錯誤/空狀態訊息與可讀性樣式
+- [X] T014 [P] [US1] 建立 `CardPicker/Models/DrawRequest.cs`、`CardPicker/Models/DrawResult.cs`、`CardPicker/Models/DrawResultState.cs`、`CardPicker/Services/IRandomIndexProvider.cs` 與 `CardPicker/Services/CryptoRandomIndexProvider.cs`，定義抽卡輸入輸出與可測試、可重現的亂數索引抽象
+- [X] T015 [US1] 建立 `CardPicker/Services/IMealDrawService.cs` 與 `CardPicker/Services/MealDrawService.cs`，實作餐別驗證、以索引均勻映射的等機率抽卡、抽卡操作記錄與空池處理
+- [X] T016 [US1] 更新 `CardPicker/Program.cs` 與 `CardPicker/Pages/Index.cshtml.cs`，接上抽卡服務、PageModel 狀態與表單提交流程
+- [X] T017 [US1] 更新 `CardPicker/Pages/Index.cshtml` 與 `CardPicker/wwwroot/css/site.css`，實作餐別選擇、抽卡結果卡片、錯誤/空狀態訊息與可讀性樣式
 
 **Checkpoint**: US1 完成後，首頁抽卡體驗即可單獨上線作為 MVP，且不依賴瀏覽或 CRUD 頁面也能產生價值。
 

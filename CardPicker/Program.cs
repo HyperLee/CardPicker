@@ -2,6 +2,8 @@ using CardPicker.Options;
 using CardPicker.Services;
 using Serilog;
 using Serilog.Events;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 
 namespace CardPicker;
 
@@ -72,6 +74,16 @@ public class Program
         ArgumentNullException.ThrowIfNull(builder);
 
         builder.Services.AddRazorPages();
+        builder.Services.AddWebEncoders(
+            options =>
+            {
+                options.TextEncoderSettings = new TextEncoderSettings(
+                    UnicodeRanges.BasicLatin,
+                    UnicodeRanges.Bopomofo,
+                    UnicodeRanges.CjkSymbolsandPunctuation,
+                    UnicodeRanges.CjkUnifiedIdeographs,
+                    UnicodeRanges.HalfwidthandFullwidthForms);
+            });
 
         builder.Services.AddHttpsRedirection(
             options =>
@@ -93,7 +105,9 @@ public class Program
             .ValidateOnStart();
 
         builder.Services.AddSingleton<IMealCardRepository, JsonMealCardRepository>();
+        builder.Services.AddSingleton<IRandomIndexProvider, CryptoRandomIndexProvider>();
         builder.Services.AddScoped<IMealCardService, MealCardService>();
+        builder.Services.AddScoped<IMealDrawService, MealDrawService>();
     }
 
     private static void ConfigurePipeline(WebApplication app)
