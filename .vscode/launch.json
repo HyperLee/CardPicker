@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "CardPicker：HTTPS 偵錯",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "建置 CardPicker Web",
+      "program": "${workspaceFolder}/CardPicker/bin/Debug/net10.0/CardPicker.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/CardPicker",
+      "stopAtEntry": false,
+      "console": "internalConsole",
+      "justMyCode": true,
+      "launchSettingsProfile": "https",
+      "launchSettingsFilePath": "${workspaceFolder}/CardPicker/Properties/launchSettings.json",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://localhost:7271;http://localhost:5280"
+      },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+https://\\S+",
+        "uriFormat": "https://localhost:7271"
+      }
+    }
+  ]
+}
